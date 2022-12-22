@@ -18,7 +18,7 @@ public class ExpressionColumn : IColumn
         Expression = expression;
     }
 
-    public ExpressionColumn(IExpression expression, string alias)
+    public ExpressionColumn(IExpression expression, string? alias)
     {
         Expression = expression;
         Alias = alias;

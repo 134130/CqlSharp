@@ -2,7 +2,7 @@ using Antlr4.Runtime;
 
 namespace CqlSharp.Parser;
 
-internal class CQLParserErrorHandler : IAntlrErrorListener<IToken>
+internal class CqlParserErrorHandler : IAntlrErrorListener<IToken>
 {
     public void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line,
         int charPositionInLine,

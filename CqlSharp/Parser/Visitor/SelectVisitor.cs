@@ -11,21 +11,23 @@ public static class SelectVisitor
 {
     public static Select VisitSelectStatement(SelectStatementContext context)
     {
-        return context.GetChild(0) switch
+        var child = context.GetChild(0);
+        return child switch
         {
             SelectExpressionContext expressionContext => VisitSelectExpression(expressionContext),
             SelectExpressionWithParensContext withParensContext => VisitSelectExpressionWithParens(withParensContext),
-            _ => throw new InvalidOperationException()
+            _ => throw new CqlNotSupportedException(child)
         };
     }
 
     private static Select VisitSelectExpressionWithParens(SelectExpressionWithParensContext context)
     {
-        return context.GetChild(1) switch
+        var child = context.GetChild(1);
+        return child switch
         {
             SelectExpressionContext expressionContext => VisitSelectExpression(expressionContext),
             SelectExpressionWithParensContext withParensContext => VisitSelectExpressionWithParens(withParensContext),
-            _ => throw new InvalidOperationException()
+            _ => throw new CqlNotSupportedException(child)
         };
     }
 
@@ -81,7 +83,7 @@ public static class SelectVisitor
                 break;
         }
 
-        throw new InvalidOperationException();
+        throw new CqlNotSupportedException(context);
     }
 
     private static IColumn VisitSingleItemSelect(SingleItemSelectContext context)
@@ -98,7 +100,8 @@ public static class SelectVisitor
     private static TableReference VisitFromClause(FromClauseContext context)
     {
         var tableReferenceContext = context.GetChild<TableReferenceContext>(0);
-        switch (tableReferenceContext.GetChild(0))
+        var child = tableReferenceContext.GetChild(0);
+        switch (child)
         {
             case SingleTableContext singleTable:
                 return VisitSingleTable(singleTable);
@@ -113,16 +116,17 @@ public static class SelectVisitor
                 return new SubQueryTableReference(subQuery, alias);
         }
 
-        throw new InvalidOperationException();
+        throw new CqlNotSupportedException(child);
     }
 
     private static TableReference VisitSingleTableWithParens(SingleTableWithParensContext context)
     {
-        return context.GetChild(1) switch
+        var child = context.GetChild(1);
+        return child switch
         {
             SingleTableContext singleTable => VisitSingleTable(singleTable),
             SingleTableWithParensContext singleTableWithParens => VisitSingleTableWithParens(singleTableWithParens),
-            _ => throw new InvalidOperationException()
+            _ => throw new CqlNotSupportedException(child)
         };
     }
 
@@ -131,7 +135,8 @@ public static class SelectVisitor
         var identifierNode = context.GetChild(2) ?? context.GetChild(1);
         var alias = identifierNode?.GetText();
 
-        switch (context.GetChild(0))
+        var child = context.GetChild(0);
+        switch (child)
         {
             case IdentifierContext identifier:
                 var column = new QualifiedIdentifier(identifier.GetText());
@@ -140,14 +145,14 @@ public static class SelectVisitor
                 return new CsvTableReference(csvFilePath.GetText()[1..^1], alias);
         }
 
-        throw new InvalidOperationException();
+        throw new CqlNotSupportedException(child);
     }
 
     private static IExpression VisitWhereClause(WhereClauseContext context)
     {
         var child = context.GetChild<ExpressionContext>(0);
         if (ExpressionVisitor.VisitExpression(child) is not IExpression whereExpression)
-            throw new InvalidOperationException();
+            throw new CqlNotSupportedException(child);
 
         return whereExpression;
     }

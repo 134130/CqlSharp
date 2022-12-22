@@ -15,9 +15,7 @@ public static class ExpressionVisitor
         switch (context)
         {
             case ExpressionDefaultContext defaultContext:
-                var defaultVisited = VisitBoolPrimitive(defaultContext.GetChild<BoolPrimitiveContext>(0));
-                if (defaultVisited is not IExpression defaultExpression)
-                    throw new InvalidOperationException();
+                var defaultExpression = VisitBoolPrimitive(defaultContext.GetChild<BoolPrimitiveContext>(0));
                 return defaultExpression;
 
             case ExpressionIsContext isContext:
@@ -30,10 +28,7 @@ public static class ExpressionVisitor
 
                 var isVisited = VisitBoolPrimitive(isContext.GetChild<BoolPrimitiveContext>(0));
 
-                if (isVisited is not IExpression isExpression)
-                    throw new InvalidOperationException();
-
-                return new IsExpression(isExpression, type);
+                return new IsExpression(isVisited, type);
 
             case ExpressionNotContext notContext:
                 return new NotExpression
@@ -54,7 +49,7 @@ public static class ExpressionVisitor
                     VisitExpression(orContext.GetChild<ExpressionContext>(1)));
         }
 
-        throw new InvalidOperationException();
+        throw new CqlNotSupportedException(context);
     }
 
     private static IExpression VisitBoolPrimitive(BoolPrimitiveContext context)
@@ -72,33 +67,35 @@ public static class ExpressionVisitor
                 var right = VisitPredicate(context.predicate());
                 var compareOperator = VisitCompareOperator(context.compareOperator());
 
-                if (left is not IExpression leftExpression)
-                    throw new InvalidOperationException();
-
                 var compareExpression = new CompareExpression
                 {
-                    Left = leftExpression,
+                    Left = left,
                     CompareOperator = compareOperator
                 };
 
-                if (right is PredicateExpression rightPredicate)
-                    compareExpression.RightPredicateExpression = rightPredicate;
-
-                else if (right is Literal rightLiteral)
-                    compareExpression.RightLiteral = rightLiteral;
-
-                else if (right is QualifiedIdentifier rightIdentifier)
-                    compareExpression.RightIdentifier = rightIdentifier;
+                switch (right)
+                {
+                    case PredicateExpression rightPredicate:
+                        compareExpression.RightPredicateExpression = rightPredicate;
+                        break;
+                    case Literal rightLiteral:
+                        compareExpression.RightLiteral = rightLiteral;
+                        break;
+                    case QualifiedIdentifier rightIdentifier:
+                        compareExpression.RightIdentifier = rightIdentifier;
+                        break;
+                }
 
                 return compareExpression;
         }
 
-        throw new InvalidOperationException();
+        throw new CqlNotSupportedException(child);
     }
 
     private static CompareOperator VisitCompareOperator(CompareOperatorContext context)
     {
-        return ((ITerminalNode)context.GetChild(0)).Symbol.Type switch
+        var symbol = ((ITerminalNode)context.GetChild(0)).Symbol;
+        return symbol.Type switch
         {
             EQUAL_OPERATOR => CompareOperator.Equal,
             NOT_EQUAL_OPERATOR => CompareOperator.NotEqual,
@@ -106,7 +103,7 @@ public static class ExpressionVisitor
             GREATER_THAN_OPERATOR => CompareOperator.GreaterThan,
             LESS_OR_EQUAL_OPERATOR => CompareOperator.LessOrEqual,
             LESS_THAN_OPERATOR => CompareOperator.LessThan,
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new ArgumentOutOfRangeException(symbol.Text)
         };
     }
 
@@ -114,31 +111,18 @@ public static class ExpressionVisitor
     {
         var simpleExpression = VisitSimpleExpression(context.GetChild<SimpleExpressionContext>(0));
 
-        PredicateOperation predicateOperation = null;
-        if (context.GetChild<PredicateOperationContext>(0) is { } predicateOperationContext)
+        var predicateOperationContext = context.GetChild<PredicateOperationContext>(0);
+        if (context.GetChild<PredicateOperationContext>(0) is null)
+            return simpleExpression;
+
+        var predicateOperation = VisitPredicateOperation(predicateOperationContext);
+
+        var predicateExpression = simpleExpression switch
         {
-            predicateOperation = VisitPredicateOperation(predicateOperationContext);
-        }
-
-        PredicateExpression predicateExpression = null;
-        switch (simpleExpression)
-        {
-            case Literal literal:
-                if (predicateOperation is null)
-                    return literal;
-
-                predicateExpression = new PredicateExpression(literal, predicateOperation);
-                break;
-            case QualifiedIdentifier identifier:
-                if (predicateOperation is null)
-                    return identifier;
-
-                predicateExpression = new PredicateExpression(identifier, predicateOperation);
-                break;
-        }
-
-        if (predicateExpression is null)
-            throw new InvalidOperationException();
+            Literal literal => new PredicateExpression(literal, predicateOperation),
+            QualifiedIdentifier identifier => new PredicateExpression(identifier, predicateOperation),
+            _ => throw new ArgumentOutOfRangeException(simpleExpression.GetType().ToString())
+        };
 
         predicateExpression.IsNot = context.children.GetToken(NOT_SYMBOL) is not null;
         return predicateExpression;
@@ -160,7 +144,7 @@ public static class ExpressionVisitor
                 return qualifiedIdentifier;
         }
 
-        throw new InvalidOperationException();
+        throw new CqlNotSupportedException(context);
     }
 
     private static Literal VisitLiteral(LiteralContext context)
@@ -204,7 +188,7 @@ public static class ExpressionVisitor
                 return new PredicateRegexpOperation(regexpPattern);
         }
 
-        throw new InvalidOperationException();
+        throw new CqlNotSupportedException(context);
     }
 
     private static string VisitTextStringLiteral(TextStringLiteralContext context)
