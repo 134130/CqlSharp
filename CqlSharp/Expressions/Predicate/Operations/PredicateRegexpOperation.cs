@@ -1,9 +1,9 @@
 using System.Text.RegularExpressions;
 using CqlSharp.Expressions.Literals;
 
-namespace CqlSharp.Expressions.Predicate;
+namespace CqlSharp.Expressions.Predicate.Operations;
 
-public sealed class PredicateRegexpOperation : PredicateOperation
+internal sealed class PredicateRegexpOperation : PredicateOperation
 {
     private Regex _regex;
 

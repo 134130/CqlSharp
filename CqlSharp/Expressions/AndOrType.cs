@@ -1,6 +1,6 @@
 namespace CqlSharp.Expressions;
 
-public enum AndOrType
+internal enum AndOrType
 {
     And,
     Or

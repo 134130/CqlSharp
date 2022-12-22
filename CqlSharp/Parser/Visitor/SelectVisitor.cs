@@ -7,7 +7,7 @@ namespace CqlSharp.Parser.Visitor;
 
 using static CqlParser;
 
-public static class SelectVisitor
+internal static class SelectVisitor
 {
     public static Select VisitSelectStatement(SelectStatementContext context)
     {

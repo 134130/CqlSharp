@@ -3,7 +3,7 @@ using CqlSharp.Expressions.Predicate;
 
 namespace CqlSharp.Expressions;
 
-public class CompareExpression : IExpression
+internal class CompareExpression : IExpression
 {
     public IExpression Left { get; set; }
 
@@ -62,14 +62,4 @@ public class CompareExpression : IExpression
     {
         return this;
     }
-}
-
-public enum CompareOperator
-{
-    Equal,
-    NotEqual,
-    GreaterOrEqual,
-    GreaterThan,
-    LessOrEqual,
-    LessThan
 }

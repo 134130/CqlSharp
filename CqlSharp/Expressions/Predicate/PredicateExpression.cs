@@ -1,8 +1,9 @@
 using CqlSharp.Expressions.Literals;
+using CqlSharp.Expressions.Predicate.Operations;
 
 namespace CqlSharp.Expressions.Predicate;
 
-public class PredicateExpression : IExpression
+internal class PredicateExpression : IExpression
 {
     public Literal? Literal { get; }
 

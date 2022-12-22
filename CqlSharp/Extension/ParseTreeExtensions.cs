@@ -3,7 +3,7 @@ using Antlr4.Runtime.Tree;
 
 namespace CqlSharp.Extension;
 
-public static class ParseTreeExtensions
+internal static class ParseTreeExtensions
 {
     public static T? GetContext<T>(this IList<IParseTree> children) where T : ParserRuleContext
     {

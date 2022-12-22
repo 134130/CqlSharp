@@ -1,13 +1,8 @@
-using System.Linq.Expressions;
 using CqlSharp.Expressions.Literals;
 
 namespace CqlSharp.Expressions;
 
-public interface IColumn : IExpression
-{
-}
-
-public class ExpressionColumn : IColumn
+internal class ExpressionColumn : IColumn
 {
     public IExpression Expression { get; }
 

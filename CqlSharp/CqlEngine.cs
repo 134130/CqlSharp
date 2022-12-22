@@ -39,13 +39,13 @@ public class CqlEngine
         var lexer = new CqlLexer(inputStream);
 
         lexer.RemoveErrorListeners();
-        lexer.AddErrorListener(new CQLLexerErrorHandler());
+        lexer.AddErrorListener(new CqlLexerErrorHandler());
 
         var tokenStream = new CommonTokenStream(lexer);
         var parser = new CqlParser(tokenStream);
 
         parser.RemoveErrorListeners();
-        parser.AddErrorListener(new CQLParserErrorHandler());
+        parser.AddErrorListener(new CqlParserErrorHandler());
 
         return parser;
     }

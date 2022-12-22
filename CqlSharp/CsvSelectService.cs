@@ -6,7 +6,7 @@ using CqlSharp.Query;
 
 namespace CqlSharp;
 
-public class CsvSelectService : SelectService
+internal class CsvSelectService : SelectService
 {
     public new static async ValueTask<Table> ProcessAsync(Select selectQuery)
     {

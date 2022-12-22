@@ -1,6 +1,6 @@
 namespace CqlSharp.Extension;
 
-public static class EnumerableExtensions
+internal static class EnumerableExtensions
 {
     public static IEnumerable<TSource> ElementsAt<TSource>(this IEnumerable<TSource> source, IEnumerable<int> indexes)
     {

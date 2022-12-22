@@ -1,6 +1,6 @@
 namespace CqlSharp.Expressions;
 
-public enum IsType
+internal enum IsType
 {
     IsTrue,
     IsFalse,

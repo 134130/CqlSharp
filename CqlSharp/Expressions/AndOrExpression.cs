@@ -2,7 +2,7 @@ using CqlSharp.Expressions.Literals;
 
 namespace CqlSharp.Expressions;
 
-public class AndOrExpression : IExpression
+internal class AndOrExpression : IExpression
 {
     public AndOrType Type { get; }
     public IExpression Left { get; }

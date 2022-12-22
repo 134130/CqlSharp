@@ -9,7 +9,7 @@ namespace CqlSharp;
 
 public class SelectService
 {
-    protected static readonly ILogger Logger = new LoggerConfiguration()
+    internal static readonly ILogger Logger = new LoggerConfiguration()
         .WriteTo.Console(theme: AnsiConsoleTheme.Code)
         .MinimumLevel.Verbose()
         .CreateLogger();
@@ -35,7 +35,7 @@ public class SelectService
         return ProcessCore(selectQuery, table);
     }
 
-    protected static Table ProcessCore(Select selectQuery, Table table)
+    internal static Table ProcessCore(Select selectQuery, Table table)
     {
         // Order By
         var orderedRows = GetOrderedRows(table.Columns, table.Rows, selectQuery.OrderBys);
@@ -56,7 +56,7 @@ public class SelectService
         return new Table(selectQuery.Columns, rows);
     }
 
-    protected static void EscapeWildcards(
+    internal static void EscapeWildcards(
         List<IColumn> columns, QualifiedIdentifier[] atColumns)
     {
         Logger.Verbose("{MethodName} >>", nameof(EscapeWildcards));
@@ -79,7 +79,7 @@ public class SelectService
         Logger.Verbose("      after: {AfterColumns}", columns);
     }
 
-    protected static IEnumerable<int> GetColumnIndexes(IEnumerable<IColumn> columns, ITable table)
+    internal static IEnumerable<int> GetColumnIndexes(IEnumerable<IColumn> columns, ITable table)
     {
         return columns
             .Select(x =>

@@ -2,7 +2,7 @@ using CqlSharp.Expressions.Literals;
 
 namespace CqlSharp.Expressions;
 
-public class IsExpression : IExpression
+internal class IsExpression : IExpression
 {
     public IExpression Expression { get; set; }
 

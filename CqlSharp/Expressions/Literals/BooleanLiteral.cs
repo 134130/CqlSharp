@@ -1,6 +1,6 @@
 namespace CqlSharp.Expressions.Literals;
 
-public sealed class BooleanLiteral : Literal
+internal sealed class BooleanLiteral : Literal
 {
     public static BooleanLiteral True => new(true);
     public static BooleanLiteral False => new(false);

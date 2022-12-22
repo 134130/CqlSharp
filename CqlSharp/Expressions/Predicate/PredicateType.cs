@@ -1,6 +1,6 @@
 namespace CqlSharp.Expressions.Predicate;
 
-public enum PredicateType
+internal enum PredicateType
 {
     Like,
     In,

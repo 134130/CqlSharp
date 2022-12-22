@@ -1,8 +1,8 @@
 using CqlSharp.Expressions.Literals;
 
-namespace CqlSharp.Expressions.Predicate;
+namespace CqlSharp.Expressions.Predicate.Operations;
 
-public sealed class PredicateInOperation : PredicateOperation
+internal sealed class PredicateInOperation : PredicateOperation
 {
     private IEnumerable<string> _literals;
 

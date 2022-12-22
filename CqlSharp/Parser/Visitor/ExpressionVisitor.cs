@@ -2,13 +2,14 @@ using Antlr4.Runtime.Tree;
 using CqlSharp.Expressions;
 using CqlSharp.Expressions.Literals;
 using CqlSharp.Expressions.Predicate;
+using CqlSharp.Expressions.Predicate.Operations;
 using CqlSharp.Extension;
 
 namespace CqlSharp.Parser.Visitor;
 
 using static CqlParser;
 
-public static class ExpressionVisitor
+internal static class ExpressionVisitor
 {
     public static IExpression VisitExpression(ExpressionContext context)
     {

@@ -1,8 +1,8 @@
 using CqlSharp.Expressions.Literals;
 
-namespace CqlSharp.Expressions.Predicate;
+namespace CqlSharp.Expressions.Predicate.Operations;
 
-public abstract class PredicateOperation
+internal abstract class PredicateOperation
 {
     public abstract BooleanLiteral Calculate(Literal literal);
 }

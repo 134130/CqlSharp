@@ -1,6 +1,6 @@
 namespace CqlSharp.Expressions.Literals;
 
-public sealed class NumberLiteral : Literal
+internal sealed class NumberLiteral : Literal
 {
     public int Value { get; set; }
 
