@@ -97,8 +97,8 @@ internal static class SelectVisitor
         var expressionContext = (ExpressionContext)context.GetChild(0);
         var expression = ExpressionVisitor.VisitExpression(expressionContext);
 
-        var alias = context.children.GetContext<IdentifierContext>()?.GetText() ??
-                    context.children.GetContext<TextStringLiteralContext>()?.GetText();
+        var alias = context.GetChild<IdentifierContext>(0)?.GetText() ??
+                    context.GetChild<TextStringLiteralContext>(0)?.GetText();
 
         return new ExpressionColumn(expression, alias);
     }

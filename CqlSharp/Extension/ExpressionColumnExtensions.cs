@@ -14,15 +14,4 @@ internal static class ExpressionColumnExtensions
 
         return -1;
     }
-
-    public static int IndexOf(this IEnumerable<QualifiedIdentifier> columns, string column)
-    {
-        foreach (var (x, i) in columns.Select((x, i) => (x, i)))
-        {
-            if (x.Name == column)
-                return i;
-        }
-
-        return -1;
-    }
 }

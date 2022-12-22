@@ -21,7 +21,8 @@ internal static class ExpressionVisitor
 
             case ExpressionIsContext isContext:
                 var isTrue = isContext.type.Type == TRUE_SYMBOL;
-                var notSymbol = isContext.children.GetToken(NOT_SYMBOL);
+
+                var notSymbol = isContext.GetToken(NOT_SYMBOL, 0);
 
                 var type = isTrue
                     ? (notSymbol is null ? IsType.IsTrue : IsType.IsNotTrue)
@@ -125,7 +126,7 @@ internal static class ExpressionVisitor
             _ => throw new ArgumentOutOfRangeException(simpleExpression.GetType().ToString())
         };
 
-        predicateExpression.IsNot = context.children.GetToken(NOT_SYMBOL) is not null;
+        predicateExpression.IsNot = context.GetToken(NOT_SYMBOL, 0) is not null;
         return predicateExpression;
     }
 
