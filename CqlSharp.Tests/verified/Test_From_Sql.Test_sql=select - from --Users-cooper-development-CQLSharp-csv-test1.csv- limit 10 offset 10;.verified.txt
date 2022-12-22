@@ -1,0 +1,16 @@
+﻿select * from "{SolutionDirectory}csv/test1.csv" limit 10 offset 10;
+
++-----+-----------+------------+----------------------+-------------+
+| id  | firstname |  lastname  |        email         | profession  |
++-----+-----------+------------+----------------------+-------------+
+| 101 | Tatiania  | Talia      | Tatiania@chequer.io  | Financial   |
+| 102 | Angelique | Roscoe     | Angelique@chequer.io | QA          |
+| 103 | Lindie    | Geffner    | Lindie@chequer.io    | Development |
+| 104 | Agathe    | Alva       | Agathe@chequer.io    | Business    |
+| 105 | Nickie    | Janith     | Nickie@chequer.io    | Development |
+| 106 | Elbertina | Montgomery | Elbertina@chequer.io | Development |
+| 107 | Deedee    | Reidar     | Deedee@chequer.io    | Financial   |
+| 108 | Misha     | Shama      | Misha@chequer.io     | Development |
+| 109 | Rosanne   | Philipp    | Rosanne@chequer.io   | Development |
+| 110 | Malina    | Bevin      | Malina@chequer.io    | Financial   |
++-----+-----------+------------+----------------------+-------------+

@@ -1,0 +1,7 @@
+﻿select * from "{SolutionDirectory}csv/test1.csv" where firstname = 'evan' and lastname = 'choi';
+
++----+-----------+----------+-----------------+------------+
+| id | firstname | lastname |      email      | profession |
++----+-----------+----------+-----------------+------------+
+| 1  | evan      | choi     | evan@chequer.io | Platform   |
++----+-----------+----------+-----------------+------------+

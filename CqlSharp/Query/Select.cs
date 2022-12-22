@@ -23,7 +23,7 @@ public class Select
 
 public abstract class TableReference
 {
-    public string Alias { get; init; }
+    public string Alias { get; protected init; }
 }
 
 public class SingleTableReference : TableReference

@@ -51,7 +51,7 @@ public class CsvSelectService : SelectService
             }
         }
 
-        return new Table(csv.Columns, rows);
+        return new Table(selectQuery.Columns, rows);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

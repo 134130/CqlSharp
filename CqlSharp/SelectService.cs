@@ -19,11 +19,16 @@ public class SelectService
         if (selectQuery.From is CsvTableReference)
             return await CsvSelectService.ProcessAsync(selectQuery);
 
-        var table = selectQuery.From switch
+        Table table;
+        switch (selectQuery.From)
         {
-            SubQueryTableReference subQueryTableReference => await ProcessAsync(subQueryTableReference.SubQuery),
-            _ => throw new NotImplementedException()
-        };
+            case SubQueryTableReference subQueryTableReference:
+                table = await ProcessAsync(subQueryTableReference.SubQuery);
+                table.Alias = subQueryTableReference.Alias;
+                break;
+            default:
+                throw new NotImplementedException();
+        }
 
         EscapeWildcards(selectQuery.Columns, table.Columns);
 
@@ -42,13 +47,13 @@ public class SelectService
         var skippedRows = wheredRows.Skip(selectQuery.Offset);
 
         // Select
-        var rows = GetSelectedRows(table.Columns, skippedRows, table);
+        var rows = GetSelectedRows(selectQuery.Columns, skippedRows, table);
 
         // Limit
         if (selectQuery.Limit > 0)
             rows = rows.Take(selectQuery.Limit);
 
-        return new Table(table.Columns, rows);
+        return new Table(selectQuery.Columns, rows);
     }
 
     protected static void EscapeWildcards(
@@ -99,7 +104,7 @@ public class SelectService
     }
 
     private static IEnumerable<string[]> GetSelectedRows(
-        IEnumerable<QualifiedIdentifier> columns,
+        IEnumerable<IColumn> columns,
         IEnumerable<string[]> rows,
         ITable table)
     {

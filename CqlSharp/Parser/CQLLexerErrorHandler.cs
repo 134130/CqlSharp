@@ -8,6 +8,6 @@ internal class CQLLexerErrorHandler : IAntlrErrorListener<int>
         int charPositionInLine,
         string msg, RecognitionException e)
     {
-        throw new Exception();
+        throw e;
     }
 }

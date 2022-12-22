@@ -1,0 +1,19 @@
+﻿select * from "{SolutionDirectory}csv/test1.csv" where firstname like '%an';
+
++------+------------+-----------+-----------------------+-------------+
+|  id  | firstname  | lastname  |         email         | profession  |
++------+------------+-----------+-----------------------+-------------+
+| 1    | evan       | choi      | evan@chequer.io       | Platform    |
+| 7    | ryan       | choi      | ryan@chequer.io       | Platform    |
+| 169  | Carol-Jean | Gherardo  | Carol-Jean@chequer.io | H/R         |
+| 219  | Christian  | Kaete     | Christian@chequer.io  | QA          |
+| 302  | Christian  | Wilkinson | Christian@chequer.io  | QA          |
+| 419  | Kristan    | Jacinda   | Kristan@chequer.io    | QA          |
+| 455  | Jan        | Ellerey   | Jan@chequer.io        | H/R         |
+| 470  | Jordan     | Hillel    | Jordan@chequer.io     | H/R         |
+| 483  | Jordan     | Leonard   | Jordan@chequer.io     | H/R         |
+| 638  | Imojean    | Mendez    | Imojean@chequer.io    | QA          |
+| 812  | Jan        | Sancho    | Jan@chequer.io        | Financial   |
+| 1004 | Sean       | Schalles  | Sean@chequer.io       | Development |
+| 1058 | Gilligan   | Howlyn    | Gilligan@chequer.io   | H/R         |
++------+------------+-----------+-----------------------+-------------+

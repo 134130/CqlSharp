@@ -33,4 +33,12 @@ public class ExpressionColumn : IColumn
     {
         throw new NotImplementedException();
     }
+
+    public override string ToString()
+    {
+        if (Expression is QualifiedIdentifier qualifiedIdentifier)
+            return qualifiedIdentifier.ToString();
+
+        return Expression.ToString();
+    }
 }

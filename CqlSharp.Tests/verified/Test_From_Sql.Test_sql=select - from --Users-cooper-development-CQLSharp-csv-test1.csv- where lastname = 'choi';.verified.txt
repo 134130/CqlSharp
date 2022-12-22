@@ -1,0 +1,9 @@
+﻿select * from "{SolutionDirectory}csv/test1.csv" where lastname = 'choi';
+
++----+-----------+----------+-------------------+------------+
+| id | firstname | lastname |       email       | profession |
++----+-----------+----------+-------------------+------------+
+| 1  | evan      | choi     | evan@chequer.io   | Platform   |
+| 4  | harold    | choi     | harold@chequer.io | Platform   |
+| 7  | ryan      | choi     | ryan@chequer.io   | Platform   |
++----+-----------+----------+-------------------+------------+

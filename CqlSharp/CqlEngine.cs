@@ -12,8 +12,17 @@ public class CqlEngine
     public static Select Parse(string sql)
     {
         Console.WriteLine(sql);
-        var parser = CreateParser(sql);
-        var context = parser.query();
+
+        QueryContext context;
+        try
+        {
+            var parser = CreateParser(sql);
+            context = parser.query();
+        }
+        catch (Exception)
+        {
+            throw new Exception($"Failed to parse sql: {sql}");
+        }
 
         if (context.GetChild(0) is not QueryStatementContext queryStatement)
             return null;
