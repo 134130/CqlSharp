@@ -8,6 +8,6 @@ internal class CqlParserErrorHandler : IAntlrErrorListener<IToken>
         int charPositionInLine,
         string msg, RecognitionException e)
     {
-        throw e;
+        throw new Exception();
     }
 }

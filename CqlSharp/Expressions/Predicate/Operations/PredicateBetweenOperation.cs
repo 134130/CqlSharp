@@ -19,7 +19,7 @@ internal sealed class PredicateBetweenOperation : PredicateOperation
             throw new InvalidOperationException();
 
         return new BooleanLiteral(
-            string.CompareOrdinal(_startLiteral, textLiteral.Value) < 0 &&
-            string.CompareOrdinal(textLiteral.Value, _endLiteral) < 0);
+            string.CompareOrdinal(_startLiteral, textLiteral.Value) <= 0 &&
+            string.CompareOrdinal(textLiteral.Value, _endLiteral) <= 0);
     }
 }

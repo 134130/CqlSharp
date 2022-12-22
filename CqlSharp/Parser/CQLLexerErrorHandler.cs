@@ -8,6 +8,6 @@ internal class CqlLexerErrorHandler : IAntlrErrorListener<int>
         int charPositionInLine,
         string msg, RecognitionException e)
     {
-        throw e;
+        throw new Exception();
     }
 }

@@ -1,0 +1,15 @@
+﻿select * from "{SolutionDirectory}csv/test1.csv" where firstname between 'aaaa' and 'zzzz';
+
++----+-----------+----------+-------------------+------------+
+| id | firstname | lastname |       email       | profession |
++----+-----------+----------+-------------------+------------+
+| 1  | evan      | choi     | evan@chequer.io   | Platform   |
+| 2  | tony      | jang     | tony@chequer.io   | Platform   |
+| 3  | cooper    | oh       | cooper@chequer.io | Platform   |
+| 4  | harold    | choi     | harold@chequer.io | Platform   |
+| 5  | danny     | kim      | danny@chequer.io  | Platform   |
+| 6  | wein      | cho      | wein@chequer.io   | Platform   |
+| 7  | ryan      | choi     | ryan@chequer.io   | Platform   |
+| 8  | alice     | park     | alice@chequer.io  | Platform   |
+| 9  | mason     | oh       | mason@chequer.io  | Platform   |
++----+-----------+----------+-------------------+------------+

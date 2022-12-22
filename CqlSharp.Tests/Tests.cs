@@ -15,7 +15,6 @@ public class Test_From_Sql
     [TestCase("select * from \"/Users/cooper/development/CQLSharp/csv/test1.csv\" limit 10;")]
     [TestCase("select * from \"/Users/cooper/development/CQLSharp/csv/test1.csv\" limit 10 offset 10;")]
     [TestCase("select * from \"/Users/cooper/development/CQLSharp/csv/test1.csv\" where lastname = 'choi';")]
-    [TestCase("select * from \"/Users/cooper/development/CQLSharp/csv/test1.csv\" where firstname like '%an';")]
     [TestCase(
         "select * from \"/Users/cooper/development/CQLSharp/csv/test1.csv\" where firstname = 'evan' and lastname = 'choi';")]
     [TestCase("select csv.firstname from (select * from \"/Users/cooper/development/CQLSharp/csv/test1.csv\") csv;")]
@@ -27,6 +26,20 @@ public class Test_From_Sql
     [TestCase("select 'hello, ' + 'world';")]
     [TestCase("select COUNT(*) from \"/Users/cooper/development/CQLSharp/csv/test1.csv\";")]
     public async Task Test(string sql)
+    {
+        var query = CqlEngine.Parse(sql);
+        var result = await SelectService.ProcessAsync(query);
+
+        await Verify(AsciiTable(sql, result)).UseDirectory("verified");
+    }
+
+    [TestCase("select * from \"/Users/cooper/development/CQLSharp/csv/test1.csv\" where firstname like '%an';")]
+    [TestCase(
+        "select * from \"/Users/cooper/development/CQLSharp/csv/test1.csv\" where firstname in ('evan', 'tony', 'wein');")]
+    [TestCase(
+        "select * from \"/Users/cooper/development/CQLSharp/csv/test1.csv\" where id between '500' and '600';")]
+    [TestCase("select * from \"/Users/cooper/development/CQLSharp/csv/test1.csv\" where firstname regexp '^[aA].+';")]
+    public async Task Test_Predicate_Operations(string sql)
     {
         var query = CqlEngine.Parse(sql);
         var result = await SelectService.ProcessAsync(query);

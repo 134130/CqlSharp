@@ -71,7 +71,7 @@ whereClause:
 expression:
     boolPrimitive #expressionDefault |
     boolPrimitive IS_SYMBOL NOT_SYMBOL? type = (TRUE_SYMBOL | FALSE_SYMBOL) #expressionIs |
-    NOT_SYMBOL expression #expressionNot |  // Single Expression Node
+    NOT_SYMBOL expression #expressionNot |
     expression AND_SYMBOL expression #expressionAnd |
     expression OR_SYMBOL expression #expressionOr;
     
@@ -90,7 +90,7 @@ simpleExpression:
   
     // TODO: bitExpression operator=PLUS_OPERATOR bitExpression #bitBinaryExpression;  // For string concat
     // operator = PLUS_OPERATOR simpleExpression #simpleExpression| // | MINUS_OPERATOR | BITWISE_NOT_OPERATOR
-
+ 
 predicateOperation:
     LIKE_SYMBOL textStringLiteral #predicateOperationLike |
     IN_SYMBOL (OPEN_PAR_SYMBOL textStringLiteral (COMMA_SYMBOL textStringLiteral)* CLOSE_PAR_SYMBOL) #predicateOperationIn | // TODO: subquery?

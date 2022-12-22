@@ -75,15 +75,21 @@ internal static class SelectVisitor
             case SingleItemSelectContext singleItemSelectContext:
                 return VisitSingleItemSelect(singleItemSelectContext);
             case MultItemSelectContext multItemSelectContext:
-                if (multItemSelectContext.GetChild(0) is IdentifierContext identifier)
-                    return new QualifiedIdentifier(identifier.GetText(), "*");
-
-                if (multItemSelectContext.GetChild(0) is ITerminalNode { Symbol.Type: MULT_OPERATOR })
-                    return new QualifiedIdentifier("*");
-                break;
+                return VisitMultItemSelect(multItemSelectContext);
         }
 
         throw new CqlNotSupportedException(context);
+    }
+
+    private static QualifiedIdentifier VisitMultItemSelect(MultItemSelectContext context)
+    {
+        var child = context.GetChild(0);
+        return child switch
+        {
+            IdentifierContext identifier => new QualifiedIdentifier(identifier.GetText(), "*"),
+            ITerminalNode { Symbol.Type: MULT_OPERATOR } => new QualifiedIdentifier("*"),
+            _ => throw new CqlNotSupportedException(child)
+        };
     }
 
     private static IColumn VisitSingleItemSelect(SingleItemSelectContext context)
