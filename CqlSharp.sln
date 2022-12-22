@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CqlSharp", "CqlSharp\CqlSharp.csproj", "{98E31429-C9D3-46C3-9871-C2E6873DAF0D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CqlRepl", "CqlRepl\CqlRepl.csproj", "{43C7B610-2338-4220-A5FF-1971BB014545}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CqlSharp.Tests", "CqlSharp.Tests\CqlSharp.Tests.csproj", "{F25200C7-4EFA-4F88-A35C-62EE48997477}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{98E31429-C9D3-46C3-9871-C2E6873DAF0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98E31429-C9D3-46C3-9871-C2E6873DAF0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98E31429-C9D3-46C3-9871-C2E6873DAF0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98E31429-C9D3-46C3-9871-C2E6873DAF0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43C7B610-2338-4220-A5FF-1971BB014545}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43C7B610-2338-4220-A5FF-1971BB014545}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43C7B610-2338-4220-A5FF-1971BB014545}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43C7B610-2338-4220-A5FF-1971BB014545}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F25200C7-4EFA-4F88-A35C-62EE48997477}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F25200C7-4EFA-4F88-A35C-62EE48997477}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F25200C7-4EFA-4F88-A35C-62EE48997477}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F25200C7-4EFA-4F88-A35C-62EE48997477}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
