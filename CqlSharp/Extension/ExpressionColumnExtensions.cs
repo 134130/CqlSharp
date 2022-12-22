@@ -8,7 +8,10 @@ internal static class ExpressionColumnExtensions
     {
         foreach (var (x, i) in columns.Select((x, i) => (x, i)))
         {
-            if (x.Name == column.Name)
+            if (x.Length != column.Length)
+                continue;
+
+            if (x.Identifiers.SequenceEqual(column.Identifiers))
                 return i;
         }
 
