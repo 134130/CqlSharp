@@ -22,7 +22,8 @@ selectExpressionWithParens:
     OPEN_PAR_SYMBOL (selectExpression | selectExpressionWithParens) CLOSE_PAR_SYMBOL;
     
 selectItemList:
-    selectItem (COMMA_SYMBOL selectItem)*;
+    selectItem (COMMA_SYMBOL selectItem)* |
+    COUNT_SYMBOL OPEN_PAR_SYMBOL MULT_OPERATOR CLOSE_PAR_SYMBOL;
     
 selectItem:
     expression (AS_SYMBOL? (identifier | textStringLiteral))? #singleItemSelect | // TODO: not implemented
@@ -80,16 +81,16 @@ boolPrimitive:
     boolPrimitive compareOperator predicate; // TODO: Binary Expression node 
 
 predicate:
-    simpleExpression | 
-    simpleExpression NOT_SYMBOL? predicateOperation; // Predicate expression
+    bitExpression |
+    bitExpression NOT_SYMBOL? predicateOperation; // Predicate expression
+
+bitExpression:
+    simpleExpression |
+    bitExpression operator = (PLUS_OPERATOR | MINUS_OPERATOR) bitExpression;
     
 simpleExpression:
     literal #simpleExpressionLiteral |
     identifier (DOT_SYMBOL identifier)? #simpleExpressionColumnReference;
-    // TODO: COUNT_SYMBOL OPEN_PAR_SYMBOL MULT_OPERATOR CLOSE_PAR_SYMBOL #simpleExpressionCountExpression;
-  
-    // TODO: bitExpression operator=PLUS_OPERATOR bitExpression #bitBinaryExpression;  // For string concat
-    // operator = PLUS_OPERATOR simpleExpression #simpleExpression| // | MINUS_OPERATOR | BITWISE_NOT_OPERATOR
  
 predicateOperation:
     LIKE_SYMBOL textStringLiteral #predicateOperationLike |

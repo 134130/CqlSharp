@@ -17,4 +17,14 @@ internal sealed class NumberLiteral : Literal
     {
         return Value.ToString();
     }
+
+    public static NumberLiteral operator +(NumberLiteral x, NumberLiteral y)
+    {
+        return new NumberLiteral(x.Value + y.Value);
+    }
+
+    public static NumberLiteral operator -(NumberLiteral x, NumberLiteral y)
+    {
+        return new NumberLiteral(x.Value - y.Value);
+    }
 }

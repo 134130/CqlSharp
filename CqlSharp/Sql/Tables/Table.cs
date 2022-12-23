@@ -28,6 +28,9 @@ public class Table : ITable
                 return new QualifiedIdentifier(expressionColumn.Expression.GetSql());
             }
 
+            if (x is CountColumn countColumn)
+                return new QualifiedIdentifier(countColumn.GetSql());
+
             throw new ArgumentOutOfRangeException($"Unexpected column type: {x.GetType().Name}");
         }).ToArray();
         Rows = rows;

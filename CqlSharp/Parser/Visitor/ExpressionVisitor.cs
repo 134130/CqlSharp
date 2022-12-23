@@ -1,6 +1,5 @@
 using Antlr4.Runtime.Tree;
 using CqlSharp.Exceptions;
-using CqlSharp.Extension;
 using CqlSharp.Sql.Expressions;
 using CqlSharp.Sql.Expressions.Columns;
 using CqlSharp.Sql.Expressions.Literals;
@@ -50,7 +49,7 @@ internal static class ExpressionVisitor
                     VisitExpression(orContext.GetChild<ExpressionContext>(1)));
         }
 
-        throw new CqlNotSupportedException(context);
+        throw new CqlNotSupportedTreeException(context);
     }
 
     private static IExpression VisitBoolPrimitive(BoolPrimitiveContext context)
@@ -76,7 +75,7 @@ internal static class ExpressionVisitor
                 };
         }
 
-        throw new CqlNotSupportedException(child);
+        throw new CqlNotSupportedTreeException(child);
     }
 
     private static CompareOperator VisitCompareOperator(CompareOperatorContext context)
@@ -96,23 +95,43 @@ internal static class ExpressionVisitor
 
     private static IExpression VisitPredicate(PredicateContext context)
     {
-        var simpleExpression = VisitSimpleExpression(context.GetChild<SimpleExpressionContext>(0));
+        var bitExpression = VisitBitExpression(context.GetChild<BitExpressionContext>(0));
 
-        var predicateOperationContext = context.GetChild<PredicateOperationContext>(0);
-        if (context.GetChild<PredicateOperationContext>(0) is null)
-            return simpleExpression;
+        // var simpleExpression = VisitSimpleExpression(context.GetChild<SimpleExpressionContext>(0));
+
+        if (context.GetChild<PredicateOperationContext>(0) is not { } predicateOperationContext)
+            return bitExpression;
 
         var predicateOperation = VisitPredicateOperation(predicateOperationContext);
 
-        var predicateExpression = simpleExpression switch
+        var predicateExpression = bitExpression switch
         {
             Literal literal => new PredicateExpression(literal, predicateOperation),
             QualifiedIdentifier identifier => new PredicateExpression(identifier, predicateOperation),
-            _ => throw new ArgumentOutOfRangeException(simpleExpression.GetType().ToString())
+            _ => throw new ArgumentOutOfRangeException(bitExpression.GetType().ToString())
         };
 
         predicateExpression.IsNot = context.GetToken(NOT_SYMBOL, 0) is not null;
         return predicateExpression;
+    }
+
+    private static IExpression VisitBitExpression(BitExpressionContext context)
+    {
+        var child = context.GetChild(0);
+
+        if (child is SimpleExpressionContext simpleExpression)
+            return VisitSimpleExpression(simpleExpression);
+
+        var left = VisitBitExpression((BitExpressionContext)child);
+        var right = VisitBitExpression(context.GetChild<BitExpressionContext>(1));
+        var @operator = context.@operator.Type switch
+        {
+            PLUS_OPERATOR => BitOperator.Plus,
+            MINUS_OPERATOR => BitOperator.Minus,
+            _ => throw new ArgumentOutOfRangeException(context.@operator.Text)
+        };
+
+        return new BitExpression(left, @operator, right);
     }
 
     private static IExpression VisitSimpleExpression(SimpleExpressionContext context)
@@ -131,7 +150,7 @@ internal static class ExpressionVisitor
                 return qualifiedIdentifier;
         }
 
-        throw new CqlNotSupportedException(context);
+        throw new CqlNotSupportedTreeException(context);
     }
 
     private static Literal VisitLiteral(LiteralContext context)
@@ -175,7 +194,7 @@ internal static class ExpressionVisitor
                 return new PredicateRegexpOperation(regexpPattern);
         }
 
-        throw new CqlNotSupportedException(context);
+        throw new CqlNotSupportedTreeException(context);
     }
 
     private static string VisitTextStringLiteral(TextStringLiteralContext context)

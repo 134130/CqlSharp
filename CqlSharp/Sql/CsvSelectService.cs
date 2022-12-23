@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using CqlSharp.Extension;
 using CqlSharp.Sql.Expressions;
 using CqlSharp.Sql.Expressions.Columns;
 using CqlSharp.Sql.Expressions.Literals;
@@ -22,6 +21,12 @@ internal class CsvSelectService : SelectService
                 await FetchCsvFileAsync(csvTableReference.FilePath, csvTableReference.Alias));
 
         using var csv = new CsvFile(filePath, csvTableReference.Alias);
+
+        if (selectQuery.IsCountQuery)
+        {
+            var rowLength = await CountRowsAsync(csv, selectQuery.WhereExpression);
+            return new Table(selectQuery.Columns, new[] { new[] { rowLength.ToString() } });
+        }
 
         EscapeWildcards(selectQuery.Columns, csv.Columns);
 
@@ -119,7 +124,7 @@ internal class CsvSelectService : SelectService
                         continue;
                     }
 
-                    fetchedRow[i] = indexedColumns[i].OriginalColumn
+                    row[i] = indexedColumns[i].OriginalColumn
                         .Calculate(csv.Columns, fetchedRow)
                         .GetSql();
                 }
@@ -145,9 +150,12 @@ internal class CsvSelectService : SelectService
                 for (var i = 0; i < indexedColumns.Length; i++)
                 {
                     if (indexedColumns[i].IndexOfRow >= 0)
+                    {
                         row[i] = fetchedRow[indexedColumns[i].IndexOfRow];
+                        continue;
+                    }
 
-                    fetchedRow[i] = indexedColumns[i].OriginalColumn
+                    row[i] = indexedColumns[i].OriginalColumn
                         .Calculate(csv.Columns, fetchedRow)
                         .GetSql();
                 }
@@ -197,6 +205,34 @@ internal class CsvSelectService : SelectService
             if (booleanLiteral)
                 currentOffset++;
         }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static async ValueTask<int> CountRowsAsync(CsvFile csv, IExpression? whereExpression)
+    {
+        var rowCount = 0;
+        if (whereExpression is null)
+        {
+            while (await csv.ReadAsync())
+            {
+                rowCount++;
+            }
+
+            return rowCount;
+        }
+
+        while (await csv.ReadAsync())
+        {
+            var row = csv.FetchRow();
+
+            if (whereExpression.Calculate(csv.Columns, row) is not BooleanLiteral booleanLiteral)
+                throw new InvalidOperationException();
+
+            if (booleanLiteral)
+                rowCount++;
+        }
+
+        return rowCount;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -1,0 +1,7 @@
+﻿select COUNT(*) from "{SolutionDirectory}csv/test1.csv";
+
++----------+
+| COUNT(*) |
++----------+
+| 1009     |
++----------+

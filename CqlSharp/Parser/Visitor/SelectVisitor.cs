@@ -1,6 +1,5 @@
 using Antlr4.Runtime.Tree;
 using CqlSharp.Exceptions;
-using CqlSharp.Extension;
 using CqlSharp.Sql.Expressions;
 using CqlSharp.Sql.Expressions.Columns;
 using CqlSharp.Sql.Query;
@@ -14,12 +13,18 @@ internal static class SelectVisitor
     public static Select VisitSelectStatement(SelectStatementContext context)
     {
         var child = context.GetChild(0);
-        return child switch
+
+        var selectQuery = child switch
         {
             SelectExpressionContext expressionContext => VisitSelectExpression(expressionContext),
             SelectExpressionWithParensContext withParensContext => VisitSelectExpressionWithParens(withParensContext),
-            _ => throw new CqlNotSupportedException(child)
+            _ => throw new CqlNotSupportedTreeException(child)
         };
+
+        if (selectQuery.Columns.Count == 1 && selectQuery.Columns[0] is CountColumn)
+            selectQuery.IsCountQuery = true;
+
+        return selectQuery;
     }
 
     private static Select VisitSelectExpressionWithParens(SelectExpressionWithParensContext context)
@@ -29,7 +34,7 @@ internal static class SelectVisitor
         {
             SelectExpressionContext expressionContext => VisitSelectExpression(expressionContext),
             SelectExpressionWithParensContext withParensContext => VisitSelectExpressionWithParens(withParensContext),
-            _ => throw new CqlNotSupportedException(child)
+            _ => throw new CqlNotSupportedTreeException(child)
         };
     }
 
@@ -65,6 +70,9 @@ internal static class SelectVisitor
 
     private static IEnumerable<IColumn> VisitSelectItemList(SelectItemListContext context)
     {
+        if (context.GetChild(0) is ITerminalNode { Symbol.Type: COUNT_SYMBOL })
+            return new[] { new CountColumn() };
+
         return context.children
             .OfType<SelectItemContext>()
             .Select(VisitSelectItem);
@@ -80,7 +88,7 @@ internal static class SelectVisitor
                 return VisitMultItemSelect(multItemSelectContext);
         }
 
-        throw new CqlNotSupportedException(context);
+        throw new CqlNotSupportedTreeException(context);
     }
 
     private static QualifiedIdentifier VisitMultItemSelect(MultItemSelectContext context)
@@ -90,7 +98,7 @@ internal static class SelectVisitor
         {
             IdentifierContext identifier => new QualifiedIdentifier(identifier.GetText(), "*"),
             ITerminalNode { Symbol.Type: MULT_OPERATOR } => new QualifiedIdentifier("*"),
-            _ => throw new CqlNotSupportedException(child)
+            _ => throw new CqlNotSupportedTreeException(child)
         };
     }
 
@@ -124,7 +132,7 @@ internal static class SelectVisitor
                 return new SubQueryTableReference(subQuery, alias);
         }
 
-        throw new CqlNotSupportedException(child);
+        throw new CqlNotSupportedTreeException(child);
     }
 
     private static TableReference VisitSingleTableWithParens(SingleTableWithParensContext context)
@@ -134,7 +142,7 @@ internal static class SelectVisitor
         {
             SingleTableContext singleTable => VisitSingleTable(singleTable),
             SingleTableWithParensContext singleTableWithParens => VisitSingleTableWithParens(singleTableWithParens),
-            _ => throw new CqlNotSupportedException(child)
+            _ => throw new CqlNotSupportedTreeException(child)
         };
     }
 
@@ -153,14 +161,14 @@ internal static class SelectVisitor
                 return new CsvTableReference(csvFilePath.GetText()[1..^1], alias);
         }
 
-        throw new CqlNotSupportedException(child);
+        throw new CqlNotSupportedTreeException(child);
     }
 
     private static IExpression VisitWhereClause(WhereClauseContext context)
     {
         var child = context.GetChild<ExpressionContext>(0);
         if (ExpressionVisitor.VisitExpression(child) is not IExpression whereExpression)
-            throw new CqlNotSupportedException(child);
+            throw new CqlNotSupportedTreeException(child);
 
         return whereExpression;
     }

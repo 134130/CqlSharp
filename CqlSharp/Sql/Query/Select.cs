@@ -22,6 +22,8 @@ public class Select : ISql
     // Columns
     public List<IColumn> Columns { get; set; }
 
+    public bool IsCountQuery { get; set; }
+
     public string GetSql()
     {
         var sb = new StringBuilder();

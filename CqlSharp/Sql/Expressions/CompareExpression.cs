@@ -10,12 +10,12 @@ internal class CompareExpression : IExpression
 
     public IExpression Right { get; }
 
-    public CompareOperator CompareOperator { get; }
+    public CompareOperator Operator { get; }
 
-    public CompareExpression(IExpression left, CompareOperator compareOperator, IExpression right)
+    public CompareExpression(IExpression left, CompareOperator @operator, IExpression right)
     {
         Left = left;
-        CompareOperator = compareOperator;
+        Operator = @operator;
         Right = right;
     }
 
@@ -24,7 +24,7 @@ internal class CompareExpression : IExpression
         var left = Left.GetOptimizedExpression();
         var right = Right.GetOptimizedExpression();
 
-        var optimized = new CompareExpression(left, CompareOperator, right);
+        var optimized = new CompareExpression(left, Operator, right);
 
         if (left is Literal && right is Literal)
             return optimized.Calculate(null, null);
@@ -34,7 +34,7 @@ internal class CompareExpression : IExpression
 
     public string GetSql()
     {
-        var compareOperatorString = CompareOperator switch
+        var compareOperatorString = Operator switch
         {
             CompareOperator.Equal => "=",
             CompareOperator.NotEqual => "!=",
@@ -65,7 +65,7 @@ internal class CompareExpression : IExpression
 
     private bool Operate(string left, string right)
     {
-        return CompareOperator switch
+        return Operator switch
         {
             CompareOperator.Equal => left == right,
             CompareOperator.NotEqual => left != right,
@@ -79,7 +79,7 @@ internal class CompareExpression : IExpression
 
     private bool Operate(int left, int right)
     {
-        return CompareOperator switch
+        return Operator switch
         {
             CompareOperator.Equal => left == right,
             CompareOperator.NotEqual => left != right,

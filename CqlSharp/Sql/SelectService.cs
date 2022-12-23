@@ -10,19 +10,6 @@ using Serilog.Sinks.SystemConsole.Themes;
 
 namespace CqlSharp.Sql;
 
-internal sealed class IndexedColumn
-{
-    public IColumn OriginalColumn { get; set; }
-
-    public int IndexOfRow { get; set; }
-
-    public IndexedColumn(IColumn column, int index)
-    {
-        OriginalColumn = column;
-        IndexOfRow = index;
-    }
-}
-
 internal class SelectService
 {
     private static readonly ILogger Logger = new LoggerConfiguration()
@@ -39,8 +26,6 @@ internal class SelectService
         if (selectQuery.From is CsvTableReference)
             return await CsvSelectService.ProcessAsync(selectQuery);
 
-
-        // TODO: without from clause
         Table table;
         switch (selectQuery.From)
         {
@@ -49,8 +34,8 @@ internal class SelectService
                 table.Alias = subQueryTableReference.Alias;
                 break;
             default:
-                throw new ArgumentOutOfRangeException(
-                    $"Unexpected table reference: {selectQuery.From?.GetType().Name ?? "null"}");
+                table = new Table(Array.Empty<QualifiedIdentifier>(), new[] { Array.Empty<string>() });
+                break;
         }
 
         EscapeWildcards(selectQuery.Columns, table.Columns);
@@ -65,6 +50,9 @@ internal class SelectService
 
         // Where
         var wheredRows = GetWheredRows(table.Columns, orderedRows, selectQuery.WhereExpression);
+
+        if (selectQuery.IsCountQuery)
+            return new Table(selectQuery.Columns, wheredRows);
 
         // Offset
         var skippedRows = wheredRows.Skip(selectQuery.Offset);
@@ -118,15 +106,13 @@ internal class SelectService
                         return new IndexedColumn(column, qiIndex);
 
                     case ExpressionColumn ec:
-                        if (ec.Expression is QualifiedIdentifier ecqi)
-                        {
-                            var ecqiIndex = table.IndexOfColumn(ecqi);
-                            if (ecqiIndex is -1)
-                                throw new ColumnNotfoundException(ecqi);
-                            return new IndexedColumn(column, ecqiIndex);
-                        }
+                        if (ec.Expression is not QualifiedIdentifier ecqi)
+                            return new IndexedColumn(column, -1);
 
-                        return new IndexedColumn(column, -1);
+                        var ecqiIndex = table.IndexOfColumn(ecqi);
+                        if (ecqiIndex is -1)
+                            throw new ColumnNotfoundException(ecqi);
+                        return new IndexedColumn(column, ecqiIndex);
                 }
 
                 throw new ArgumentOutOfRangeException();
@@ -153,7 +139,7 @@ internal class SelectService
                     continue;
                 }
 
-                fetchedRow[i] = indexedColumns[i].OriginalColumn
+                row[i] = indexedColumns[i].OriginalColumn
                     .Calculate(table.Columns, fetchedRow)
                     .GetSql();
             }
