@@ -14,14 +14,14 @@ internal class SelectService
 {
     private static readonly ILogger Logger = new LoggerConfiguration()
         .WriteTo.Console(theme: AnsiConsoleTheme.Code)
-        .MinimumLevel.Verbose()
+        .MinimumLevel.Information()
         .CreateLogger();
 
     internal static async ValueTask<Table> ProcessAsync(Select selectQuery)
     {
-        Logger.Verbose("    Plain SQL: {PlainSql}", selectQuery.GetSql());
+        Logger.Information("    Plain SQL: {PlainSql}", selectQuery.GetSql());
         selectQuery.WhereExpression = selectQuery.WhereExpression?.GetOptimizedExpression();
-        Logger.Verbose("Optimized SQL: {OptimizedSql}", selectQuery.GetSql());
+        Logger.Information("Optimized SQL: {OptimizedSql}", selectQuery.GetSql());
 
         if (selectQuery.From is CsvTableReference)
             return await CsvSelectService.ProcessAsync(selectQuery);

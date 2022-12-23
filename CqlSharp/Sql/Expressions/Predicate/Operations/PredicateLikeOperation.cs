@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using CqlSharp.Extension;
 using CqlSharp.Sql.Expressions.Literals;
 
 namespace CqlSharp.Sql.Expressions.Predicate.Operations;
@@ -10,9 +11,8 @@ internal sealed class PredicateLikeOperation : PredicateOperation
 
     public PredicateLikeOperation(string pattern)
     {
-        // TODO: Replace escaping
         _originalPattern = pattern;
-        _regex = new Regex($"^{pattern.Replace("%", ".+")}$");
+        _regex = new Regex($"^{pattern.Replace('%', ".*", '\\')}$");
     }
 
     public override BooleanLiteral Calculate(Literal literal)

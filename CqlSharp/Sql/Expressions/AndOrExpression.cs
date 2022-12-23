@@ -1,3 +1,4 @@
+using CqlSharp.Exceptions;
 using CqlSharp.Sql.Expressions.Columns;
 using CqlSharp.Sql.Expressions.Literals;
 
@@ -51,21 +52,21 @@ internal class AndOrExpression : IExpression
 
     public Literal Calculate(QualifiedIdentifier[] columns, string[] row)
     {
-        var left = (BooleanLiteral)Left.Calculate(columns, row);
-        var right = new Lazy<BooleanLiteral>(() => (BooleanLiteral)Right.Calculate(columns, row));
+        var left = Left.Calculate(columns, row);
+        if (left is not BooleanLiteral boolLeft)
+            throw new CqlExpressionException($"Left must be boolean type: {left.GetType().Name}: {GetSql()}");
 
-        //TODO
-        return Type switch
-        {
-            AndOrType.And => new BooleanLiteral
-            {
-                Value = left.Value && right.Value.Value
-            },
-            AndOrType.Or => new BooleanLiteral
-            {
-                Value = left.Value || right.Value.Value
-            },
-            _ => throw new ArgumentOutOfRangeException()
-        };
+        if (Type is AndOrType.Or && boolLeft.Value)
+            return BooleanLiteral.True;
+
+        if (Type is AndOrType.And && !boolLeft.Value)
+            return BooleanLiteral.False;
+
+        var right = Right.Calculate(columns, row);
+
+        if (right is not BooleanLiteral)
+            throw new CqlExpressionException($"Right must be boolean type: {right.GetType().Name}: {GetSql()}");
+
+        return right;
     }
 }

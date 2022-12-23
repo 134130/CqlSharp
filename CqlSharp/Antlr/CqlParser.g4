@@ -26,7 +26,7 @@ selectItemList:
     COUNT_SYMBOL OPEN_PAR_SYMBOL MULT_OPERATOR CLOSE_PAR_SYMBOL;
     
 selectItem:
-    expression (AS_SYMBOL? (identifier | textStringLiteral))? #singleItemSelect | // TODO: not implemented
+    expression (AS_SYMBOL? (identifier | textStringLiteral))? #singleItemSelect |
     identifier DOT_SYMBOL MULT_OPERATOR #multItemSelect |
     MULT_OPERATOR #multItemSelect;
 
@@ -78,7 +78,7 @@ expression:
     
 boolPrimitive: 
     predicate |
-    boolPrimitive compareOperator predicate; // TODO: Binary Expression node 
+    boolPrimitive compareOperator predicate; 
 
 predicate:
     bitExpression |
@@ -94,7 +94,7 @@ simpleExpression:
  
 predicateOperation:
     LIKE_SYMBOL textStringLiteral #predicateOperationLike |
-    IN_SYMBOL (OPEN_PAR_SYMBOL textStringLiteral (COMMA_SYMBOL textStringLiteral)* CLOSE_PAR_SYMBOL) #predicateOperationIn | // TODO: subquery?
+    IN_SYMBOL (OPEN_PAR_SYMBOL textStringLiteral (COMMA_SYMBOL textStringLiteral)* CLOSE_PAR_SYMBOL) #predicateOperationIn |
     BETWEEN_SYMBOL textStringLiteral AND_SYMBOL textStringLiteral #predicateOperationBetween |
     REGEXP_SYMBOL textStringLiteral #predicateOperationRegexp ;
 

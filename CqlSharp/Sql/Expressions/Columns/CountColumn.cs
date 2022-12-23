@@ -11,7 +11,7 @@ public class CountColumn : IColumn
 
     public Literal Calculate(QualifiedIdentifier[] columns, string[] row)
     {
-        throw new NotImplementedException();
+        throw new InvalidOperationException("This method must not be reached");
     }
 
     public IExpression GetOptimizedExpression()

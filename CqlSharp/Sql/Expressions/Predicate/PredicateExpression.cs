@@ -33,7 +33,6 @@ internal class PredicateExpression : IExpression
         if (PredicateOperation is null)
             throw new ArgumentNullException($"{nameof(PredicateOperation)} can not be null");
 
-        // TODO: remove literal, qidentifier and switch to IExpression
         var result = PredicateOperation.Calculate(Literal ?? qualifiedIdentifier);
         return IsNot ? !result : result;
     }
