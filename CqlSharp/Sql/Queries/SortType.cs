@@ -1,4 +1,4 @@
-namespace CqlSharp.Sql.Query;
+namespace CqlSharp.Sql.Queries;
 
 public enum SortType
 {

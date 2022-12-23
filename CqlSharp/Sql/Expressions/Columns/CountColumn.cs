@@ -2,7 +2,7 @@ using CqlSharp.Sql.Expressions.Literals;
 
 namespace CqlSharp.Sql.Expressions.Columns;
 
-public class CountColumn : IColumn
+internal class CountColumn : IColumn
 {
     public string GetSql()
     {

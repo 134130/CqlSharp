@@ -4,7 +4,7 @@ using CqlSharp.Sql.Expressions.Literals;
 
 namespace CqlSharp.Sql.Expressions.Columns;
 
-public class QualifiedIdentifier : IColumn
+internal class QualifiedIdentifier : IColumn
 {
     public int Length => Identifiers.Length;
 
@@ -17,6 +17,12 @@ public class QualifiedIdentifier : IColumn
     public string this[Index index] => Identifiers[index];
 
     public string[] this[Range range] => Identifiers[range];
+
+    public static bool operator ==(QualifiedIdentifier a, QualifiedIdentifier b) =>
+        a.Identifiers.SequenceEqual(b.Identifiers);
+
+    public static bool operator !=(QualifiedIdentifier a, QualifiedIdentifier b) =>
+        !a.Identifiers.SequenceEqual(b.Identifiers);
 
     public bool IsWildcard => Identifiers[^1] == "*";
 

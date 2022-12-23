@@ -3,7 +3,7 @@ using CqlSharp.Sql.Expressions.Literals;
 
 namespace CqlSharp.Sql.Expressions;
 
-public interface IExpression : ISql
+internal interface IExpression : ISql
 {
     public Literal Calculate(QualifiedIdentifier[] columns, string[] row);
 

@@ -9,7 +9,27 @@ query:
     (queryStatement (SEMICOLON_SYMBOL EOF? | EOF))+;
 
 queryStatement:
-    selectStatement;
+    selectStatement |
+    insertStatement;
+
+insertStatement:
+    INSERT_SYMBOL intoClause selectStatement #insertStatementSelect |
+    INSERT_SYMBOL intoClause OPEN_PAR_SYMBOL columnNames CLOSE_PAR_SYMBOL valuesClause #insertStatementValues;
+
+intoClause:
+    INTO_SYMBOL csvFilePath;
+    
+valuesClause:
+    VALUES_SYMBOL valueItemList;
+
+columnNames:
+    identifier (COMMA_SYMBOL identifier)*;
+
+valueItemList:
+    valueItem (COMMA_SYMBOL valueItem)*;
+
+valueItem:
+    OPEN_PAR_SYMBOL textStringLiteral (COMMA_SYMBOL textStringLiteral)* CLOSE_PAR_SYMBOL;
 
 selectStatement:
     selectExpression |
@@ -113,7 +133,7 @@ literal:
     boolLiteral;
 
 textLiteral:
-    textStringLiteral+;
+    textStringLiteral;
     
 textStringLiteral:
     value = SINGLE_QUOTED_TEXT;

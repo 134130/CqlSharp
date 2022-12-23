@@ -1,8 +1,9 @@
 using System.Runtime.CompilerServices;
+using CqlSharp.Exceptions;
 using CqlSharp.Sql.Expressions;
 using CqlSharp.Sql.Expressions.Columns;
 using CqlSharp.Sql.Expressions.Literals;
-using CqlSharp.Sql.Query;
+using CqlSharp.Sql.Queries;
 using CqlSharp.Sql.Tables;
 
 namespace CqlSharp.Sql;
@@ -20,7 +21,15 @@ internal class CsvSelectService : SelectService
             return ProcessCore(selectQuery,
                 await FetchCsvFileAsync(csvTableReference.FilePath, csvTableReference.Alias));
 
-        using var csv = new CsvFile(filePath, csvTableReference.Alias);
+        CsvFile csv;
+        try
+        {
+            csv = new CsvFile(filePath, csvTableReference.Alias);
+        }
+        catch (Exception)
+        {
+            throw new CqlSharpException($"Failed to open file: {filePath}");
+        }
 
         if (selectQuery.IsCountQuery)
         {
@@ -90,6 +99,8 @@ internal class CsvSelectService : SelectService
                 rows.Add(fetchedRow!);
             }
         }
+
+        csv.Dispose();
 
         return new Table(selectQuery.Columns, rows);
     }

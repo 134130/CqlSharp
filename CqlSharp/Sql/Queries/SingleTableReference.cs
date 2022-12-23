@@ -1,7 +1,6 @@
-using CqlSharp.Sql.Expressions;
 using CqlSharp.Sql.Expressions.Columns;
 
-namespace CqlSharp.Sql.Query;
+namespace CqlSharp.Sql.Queries;
 
 internal class SingleTableReference : TableReference
 {

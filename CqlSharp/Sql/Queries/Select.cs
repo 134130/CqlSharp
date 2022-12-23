@@ -2,9 +2,9 @@ using System.Text;
 using CqlSharp.Sql.Expressions;
 using CqlSharp.Sql.Expressions.Columns;
 
-namespace CqlSharp.Sql.Query;
+namespace CqlSharp.Sql.Queries;
 
-public class Select : ISql
+internal class Select : Query
 {
     public TableReference? From { get; set; }
 
@@ -24,7 +24,7 @@ public class Select : ISql
 
     public bool IsCountQuery { get; set; }
 
-    public string GetSql()
+    public override string GetSql()
     {
         var sb = new StringBuilder();
         sb.Append("SELECT ")

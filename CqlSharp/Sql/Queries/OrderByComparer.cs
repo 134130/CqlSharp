@@ -1,4 +1,4 @@
-namespace CqlSharp.Sql.Query;
+namespace CqlSharp.Sql.Queries;
 
 internal class OrderByComparer : IComparer<string[]>
 {

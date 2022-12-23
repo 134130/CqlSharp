@@ -26,7 +26,7 @@ internal class CsvFile : ITable, IDisposable
         _csvReader = new CsvReader(_streamReader, CultureInfo.InvariantCulture);
 
         if (!_csvReader.Read() || !_csvReader.ReadHeader())
-            throw new InvalidDataException();
+            throw new InvalidDataException("Found invalid data while reading header");
 
         if (_csvReader.HeaderRecord is { } headerRecord)
             Columns = headerRecord.Select(x => new QualifiedIdentifier(x)).ToArray();

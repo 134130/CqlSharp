@@ -1,9 +1,8 @@
-using CqlSharp.Sql.Expressions;
 using CqlSharp.Sql.Expressions.Columns;
 
 namespace CqlSharp.Sql.Tables;
 
-public interface ITable
+internal interface ITable
 {
     public string? Alias { get; }
     public QualifiedIdentifier[] Columns { get; }

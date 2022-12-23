@@ -1,9 +1,8 @@
-using CqlSharp.Sql.Expressions;
 using CqlSharp.Sql.Expressions.Columns;
 
-namespace CqlSharp.Sql.Query;
+namespace CqlSharp.Sql.Queries;
 
-public class OrderBy : ISql
+internal class OrderBy : ISql
 {
     public QualifiedIdentifier Column { get; set; }
 

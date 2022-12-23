@@ -1,6 +1,6 @@
 namespace CqlSharp.Sql;
 
-public interface ISql
+internal interface ISql
 {
     public string GetSql();
 }

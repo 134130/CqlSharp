@@ -2,7 +2,7 @@ using Antlr4.Runtime.Tree;
 using CqlSharp.Exceptions;
 using CqlSharp.Sql.Expressions;
 using CqlSharp.Sql.Expressions.Columns;
-using CqlSharp.Sql.Query;
+using CqlSharp.Sql.Queries;
 
 namespace CqlSharp.Parser.Visitor;
 

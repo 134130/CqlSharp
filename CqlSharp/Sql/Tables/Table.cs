@@ -2,13 +2,22 @@ using CqlSharp.Sql.Expressions.Columns;
 
 namespace CqlSharp.Sql.Tables;
 
-public class Table : ITable
+internal class Table : ITable
 {
     public string? Alias { get; set; }
 
     public QualifiedIdentifier[] Columns { get; }
 
     public IEnumerable<string[]> Rows { get; }
+
+    public int RowSize => _rowSize.Value;
+
+    private Lazy<int> _rowSize;
+
+    public Table(IEnumerable<string> columns, IEnumerable<string[]> rows, string? alias = null) :
+        this(columns.Select(x => new QualifiedIdentifier(x)), rows, alias)
+    {
+    }
 
     public Table(IEnumerable<IColumn> columns, IEnumerable<string[]> rows, string? alias = null)
     {
@@ -35,5 +44,6 @@ public class Table : ITable
         }).ToArray();
         Rows = rows;
         Alias = alias;
+        _rowSize = new Lazy<int>(() => Rows.Count());
     }
 }

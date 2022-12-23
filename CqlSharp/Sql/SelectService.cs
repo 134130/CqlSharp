@@ -3,7 +3,7 @@ using CqlSharp.Extension;
 using CqlSharp.Sql.Expressions;
 using CqlSharp.Sql.Expressions.Columns;
 using CqlSharp.Sql.Expressions.Literals;
-using CqlSharp.Sql.Query;
+using CqlSharp.Sql.Queries;
 using CqlSharp.Sql.Tables;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
@@ -43,7 +43,7 @@ internal class SelectService
         return ProcessCore(selectQuery, table);
     }
 
-    internal static Table ProcessCore(Select selectQuery, Table table)
+    protected static Table ProcessCore(Select selectQuery, Table table)
     {
         // Order By
         var orderedRows = GetOrderedRows(table.Columns, table.Rows, selectQuery.OrderBys);
@@ -67,7 +67,7 @@ internal class SelectService
         return new Table(selectQuery.Columns, rows);
     }
 
-    internal static void EscapeWildcards(
+    protected static void EscapeWildcards(
         List<IColumn> columns, QualifiedIdentifier[] atColumns)
     {
         Logger.Verbose("{MethodName} >>", nameof(EscapeWildcards));
@@ -90,7 +90,7 @@ internal class SelectService
         Logger.Verbose("      after: {AfterColumns}", columns.Select(x => x.GetSql()));
     }
 
-    internal static IEnumerable<IndexedColumn> GetIndexedColumns(IEnumerable<IColumn> columns, ITable table)
+    public static IEnumerable<IndexedColumn> GetIndexedColumns(IEnumerable<IColumn> columns, ITable table)
     {
         return columns
             .Select(column =>
@@ -112,6 +112,7 @@ internal class SelectService
                         var ecqiIndex = table.IndexOfColumn(ecqi);
                         if (ecqiIndex is -1)
                             throw new ColumnNotfoundException(ecqi);
+
                         return new IndexedColumn(column, ecqiIndex);
                 }
 

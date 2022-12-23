@@ -2,7 +2,7 @@ using CqlSharp.Sql.Expressions.Columns;
 
 namespace CqlSharp.Sql.Expressions.Literals;
 
-public abstract class Literal : IExpression
+internal abstract class Literal : IExpression
 {
     public Literal Calculate(QualifiedIdentifier[] columns, string[] row)
     {

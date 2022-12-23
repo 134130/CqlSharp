@@ -10,7 +10,7 @@ public class CqlSharpException : Exception
     }
 }
 
-public class ColumnNotfoundException : CqlSharpException
+internal class ColumnNotfoundException : CqlSharpException
 {
     public ColumnNotfoundException(IColumn column) : base(CreateMessage(column))
     {

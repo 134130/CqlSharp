@@ -1,5 +1,5 @@
 namespace CqlSharp.Sql.Expressions.Columns;
 
-public interface IColumn : IExpression
+internal interface IColumn : IExpression
 {
 }

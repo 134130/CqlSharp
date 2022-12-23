@@ -21,14 +21,20 @@ public static class Program
 
             try
             {
-                var stopwatch = Stopwatch.StartNew();
                 var result = await RunAsync(sql);
-                stopwatch.Stop();
 
-                PrintTableAscii(result);
+                if (result is SelectResult selectResult)
+                {
+                    PrintTableAscii(selectResult);
+                    Console.WriteLine("{0} row{1} is set ({2:%s\\.ffff} sec)",
+                        result.AffectedRows, result.AffectedRows > 1 ? "s" : "", result.Elapsed);
+                }
 
-                Console.WriteLine($"{result.Rows.Count()} rows is set ({stopwatch.Elapsed.ToString("%s\\.ffff")} sec)",
-                    (double)stopwatch.ElapsedMilliseconds / 1000);
+                if (result is InsertResult insertResult)
+                {
+                    Console.WriteLine("{0} row{1} affected ({2:%s\\.ffff} sec)",
+                        result.AffectedRows, result.AffectedRows > 1 ? "s" : "", result.Elapsed);
+                }
             }
             catch (CqlSharpException e)
             {
@@ -39,9 +45,9 @@ public static class Program
         Console.WriteLine("Bye");
     }
 
-    public static void PrintTableAscii(Table table)
+    public static void PrintTableAscii(SelectResult result)
     {
-        var maxLengthOfColumns = GetMaxLengthOfColumns(table);
+        var maxLengthOfColumns = GetMaxLengthOfColumns(result);
 
         var sb = new StringBuilder();
         sb.AppendSeperater(maxLengthOfColumns);
@@ -51,12 +57,12 @@ public static class Program
         for (var i = 0; i < maxLengthOfColumns.Length; i++)
         {
             var baseLength = maxLengthOfColumns[i];
-            var columnLength = table.Columns[i].Name.Length;
+            var columnLength = result.Columns[i].Length;
 
             var leftPadding = (baseLength - columnLength) / 2;
             var rightPadding = baseLength - columnLength - leftPadding;
 
-            sb.Append($" {new string(' ', leftPadding)}{table.Columns[i].Name}{new string(' ', rightPadding)} |");
+            sb.Append($" {new string(' ', leftPadding)}{result.Columns[i]}{new string(' ', rightPadding)} |");
         }
 
         sb.AppendLine();
@@ -65,7 +71,7 @@ public static class Program
 
         // Rows
         var lineFormatter = GetStringFormatter(maxLengthOfColumns);
-        foreach (var row in table.Rows)
+        foreach (var row in result.Rows)
         {
             sb.AppendFormat(lineFormatter, row);
             sb.AppendLine();
@@ -89,18 +95,18 @@ public static class Program
         return formatSb.ToString();
     }
 
-    private static int[] GetMaxLengthOfColumns(Table table)
+    private static int[] GetMaxLengthOfColumns(SelectResult result)
     {
-        var maxLengthOfColumns = new int[table.Columns.Length];
+        var maxLengthOfColumns = new int[result.Columns.Length];
 
-        for (var i = 0; i < table.Columns.Length; i++)
+        for (var i = 0; i < result.Columns.Length; i++)
         {
-            maxLengthOfColumns[i] = table.Columns[i].Name.Length;
+            maxLengthOfColumns[i] = result.Columns[i].Length;
         }
 
-        foreach (var row in table.Rows)
+        foreach (var row in result.Rows)
         {
-            for (var i = 0; i < table.Columns.Length; i++)
+            for (var i = 0; i < result.Columns.Length; i++)
             {
                 maxLengthOfColumns[i] = Math.Max(maxLengthOfColumns[i], row[i].Length);
             }
@@ -120,7 +126,7 @@ public static class Program
         return line;
     }
 
-    private static async ValueTask<Table> RunAsync(string sql)
+    private static async ValueTask<QueryResult> RunAsync(string sql)
     {
         var parsed = CqlEngine.Parse(sql);
         return await CqlEngine.ProcessAsync(parsed);

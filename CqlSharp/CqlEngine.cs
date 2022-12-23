@@ -1,10 +1,10 @@
+using System.Diagnostics;
 using Antlr4.Runtime;
 using CqlSharp.Exceptions;
 using CqlSharp.Parser;
 using CqlSharp.Parser.Visitor;
 using CqlSharp.Sql;
-using CqlSharp.Sql.Query;
-using CqlSharp.Sql.Tables;
+using CqlSharp.Sql.Queries;
 
 namespace CqlSharp;
 
@@ -12,15 +12,36 @@ using static CqlParser;
 
 public static class CqlEngine
 {
-    public static async ValueTask<Table> ProcessAsync(Select select)
+    public static async ValueTask<QueryResult> ProcessAsync(Query query)
     {
-        return await SelectService.ProcessAsync(select);
+        var stopwatch = Stopwatch.StartNew();
+        switch (query)
+        {
+            case Select select:
+                var table = await SelectService.ProcessAsync(select);
+
+                return new SelectResult
+                {
+                    AffectedRows = table.RowSize,
+                    Columns = table.Columns.Select(x => x.Name).ToArray(),
+                    Rows = table.Rows,
+                    Elapsed = stopwatch.Elapsed
+                };
+            case Insert insert:
+                var affectedRows = await InsertService.ProcessAsync(insert);
+
+                return new InsertResult
+                {
+                    AffectedRows = affectedRows,
+                    Elapsed = stopwatch.Elapsed
+                };
+            default:
+                throw new ArgumentOutOfRangeException(nameof(query), query, null);
+        }
     }
 
-    public static Select Parse(string sql)
+    public static Query Parse(string sql)
     {
-        Console.WriteLine(sql);
-
         QueryContext context;
         try
         {
@@ -35,10 +56,7 @@ public static class CqlEngine
         if (context.GetChild(0) is not QueryStatementContext queryStatement)
             return null;
 
-        if (queryStatement.GetChild(0) is not SelectStatementContext selectStatement)
-            return null;
-
-        return SelectVisitor.VisitSelectStatement(selectStatement);
+        return QueryVisitor.VisitQueryStatement(queryStatement);
     }
 
     private static CqlParser CreateParser(string input)
