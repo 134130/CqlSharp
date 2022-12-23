@@ -25,7 +25,7 @@ selectItemList:
     selectItem (COMMA_SYMBOL selectItem)*;
     
 selectItem:
-    expression (AS_SYMBOL? (identifier | textStringLiteral))? #singleItemSelect | 
+    expression (AS_SYMBOL? (identifier | textStringLiteral))? #singleItemSelect | // TODO: not implemented
     identifier DOT_SYMBOL MULT_OPERATOR #multItemSelect |
     MULT_OPERATOR #multItemSelect;
 

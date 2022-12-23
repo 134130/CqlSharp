@@ -1,9 +1,10 @@
 using Antlr4.Runtime.Tree;
-using CqlSharp.Expressions;
-using CqlSharp.Expressions.Literals;
-using CqlSharp.Expressions.Predicate;
-using CqlSharp.Expressions.Predicate.Operations;
+using CqlSharp.Exceptions;
 using CqlSharp.Extension;
+using CqlSharp.Sql.Expressions;
+using CqlSharp.Sql.Expressions.Literals;
+using CqlSharp.Sql.Expressions.Predicate;
+using CqlSharp.Sql.Expressions.Predicate.Operations;
 
 namespace CqlSharp.Parser.Visitor;
 

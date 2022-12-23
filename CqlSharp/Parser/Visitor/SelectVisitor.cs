@@ -1,7 +1,8 @@
 using Antlr4.Runtime.Tree;
-using CqlSharp.Expressions;
+using CqlSharp.Exceptions;
 using CqlSharp.Extension;
-using CqlSharp.Query;
+using CqlSharp.Sql.Expressions;
+using CqlSharp.Sql.Query;
 
 namespace CqlSharp.Parser.Visitor;
 

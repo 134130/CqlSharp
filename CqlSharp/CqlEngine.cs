@@ -1,13 +1,15 @@
 using Antlr4.Runtime;
 using CqlSharp.Parser;
 using CqlSharp.Parser.Visitor;
-using CqlSharp.Query;
+using CqlSharp.Sql;
+using CqlSharp.Sql.Query;
+using CqlSharp.Sql.Tables;
 
 namespace CqlSharp;
 
 using static CqlParser;
 
-public class CqlEngine
+public static class CqlEngine
 {
     public static async ValueTask<Table> ProcessAsync(Select select)
     {

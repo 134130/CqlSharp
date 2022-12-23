@@ -1,5 +1,6 @@
 using System.Text;
 using CqlRepl;
+using CqlSharp.Sql.Tables;
 using FluentAssertions;
 
 namespace CqlSharp.Tests;

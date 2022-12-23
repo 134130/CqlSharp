@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Text;
 using CqlSharp;
+using CqlSharp.Exceptions;
+using CqlSharp.Sql.Tables;
 
 namespace CqlRepl;
 
@@ -17,14 +19,21 @@ public static class Program
             if (sql == "quit")
                 break;
 
-            var stopwatch = Stopwatch.StartNew();
-            var result = await RunAsync(sql);
-            stopwatch.Stop();
+            try
+            {
+                var stopwatch = Stopwatch.StartNew();
+                var result = await RunAsync(sql);
+                stopwatch.Stop();
 
-            PrintTableAscii(result);
+                PrintTableAscii(result);
 
-            Console.WriteLine($"{result.Rows.Count()} rows is set ({stopwatch.Elapsed.ToString("%s\\.ffff")} sec)",
-                (double)stopwatch.ElapsedMilliseconds / 1000);
+                Console.WriteLine($"{result.Rows.Count()} rows is set ({stopwatch.Elapsed.ToString("%s\\.ffff")} sec)",
+                    (double)stopwatch.ElapsedMilliseconds / 1000);
+            }
+            catch (CqlSharpException e)
+            {
+                Console.WriteLine($"ERROR: {e.Message}");
+            }
         } while (true);
 
         Console.WriteLine("Bye");

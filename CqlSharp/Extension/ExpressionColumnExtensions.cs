@@ -1,4 +1,4 @@
-using CqlSharp.Expressions;
+using CqlSharp.Sql.Expressions;
 
 namespace CqlSharp.Extension;
 
