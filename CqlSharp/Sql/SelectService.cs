@@ -1,6 +1,7 @@
 using CqlSharp.Exceptions;
 using CqlSharp.Extension;
 using CqlSharp.Sql.Expressions;
+using CqlSharp.Sql.Expressions.Columns;
 using CqlSharp.Sql.Expressions.Literals;
 using CqlSharp.Sql.Query;
 using CqlSharp.Sql.Tables;
@@ -8,6 +9,19 @@ using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 
 namespace CqlSharp.Sql;
+
+internal sealed class IndexedColumn
+{
+    public IColumn OriginalColumn { get; set; }
+
+    public int IndexOfRow { get; set; }
+
+    public IndexedColumn(IColumn column, int index)
+    {
+        OriginalColumn = column;
+        IndexOfRow = index;
+    }
+}
 
 internal class SelectService
 {
@@ -35,7 +49,8 @@ internal class SelectService
                 table.Alias = subQueryTableReference.Alias;
                 break;
             default:
-                throw new ArgumentOutOfRangeException($"Unexpected table reference: {selectQuery.From.GetType().Name}");
+                throw new ArgumentOutOfRangeException(
+                    $"Unexpected table reference: {selectQuery.From?.GetType().Name ?? "null"}");
         }
 
         EscapeWildcards(selectQuery.Columns, table.Columns);
@@ -87,27 +102,34 @@ internal class SelectService
         Logger.Verbose("      after: {AfterColumns}", columns.Select(x => x.GetSql()));
     }
 
-    internal static IEnumerable<int> GetColumnIndexes(IEnumerable<IColumn> columns, ITable table)
+    internal static IEnumerable<IndexedColumn> GetIndexedColumns(IEnumerable<IColumn> columns, ITable table)
     {
         return columns
-            .Select(x =>
+            .Select(column =>
             {
-                var qualifiedIdentifier = x switch
+                switch (column)
                 {
-                    ExpressionColumn ec => ec.Expression as QualifiedIdentifier,
-                    QualifiedIdentifier qi => qi,
-                    _ => null
-                };
+                    case QualifiedIdentifier qi:
+                        var qiIndex = table.IndexOfColumn(qi);
 
-                if (qualifiedIdentifier is null)
-                    throw new ArgumentNullException($"{nameof(qualifiedIdentifier)} can not be null");
+                        if (qiIndex is -1)
+                            throw new ColumnNotfoundException(qi);
 
-                var index = table.IndexOfColumn(qualifiedIdentifier);
+                        return new IndexedColumn(column, qiIndex);
 
-                if (index is -1)
-                    throw new ColumnNotfoundException(qualifiedIdentifier);
+                    case ExpressionColumn ec:
+                        if (ec.Expression is QualifiedIdentifier ecqi)
+                        {
+                            var ecqiIndex = table.IndexOfColumn(ecqi);
+                            if (ecqiIndex is -1)
+                                throw new ColumnNotfoundException(ecqi);
+                            return new IndexedColumn(column, ecqiIndex);
+                        }
 
-                return index;
+                        return new IndexedColumn(column, -1);
+                }
+
+                throw new ArgumentOutOfRangeException();
             });
     }
 
@@ -116,8 +138,28 @@ internal class SelectService
         IEnumerable<string[]> rows,
         ITable table)
     {
-        var columnIndexes = GetColumnIndexes(columns, table);
-        return rows.Select(x => x.ElementsAt(columnIndexes).ToArray());
+        var indexedColumns = GetIndexedColumns(columns, table).ToArray();
+
+        return rows.Select(fetchedRow =>
+        {
+            var row = new string[indexedColumns.Length];
+
+            // inject calculated column
+            for (var i = 0; i < indexedColumns.Length; i++)
+            {
+                if (indexedColumns[i].IndexOfRow >= 0)
+                {
+                    row[i] = fetchedRow[indexedColumns[i].IndexOfRow];
+                    continue;
+                }
+
+                fetchedRow[i] = indexedColumns[i].OriginalColumn
+                    .Calculate(table.Columns, fetchedRow)
+                    .GetSql();
+            }
+
+            return row;
+        });
     }
 
     private static IEnumerable<string[]> GetWheredRows(

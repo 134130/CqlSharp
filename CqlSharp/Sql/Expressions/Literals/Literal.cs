@@ -1,3 +1,5 @@
+using CqlSharp.Sql.Expressions.Columns;
+
 namespace CqlSharp.Sql.Expressions.Literals;
 
 public abstract class Literal : IExpression

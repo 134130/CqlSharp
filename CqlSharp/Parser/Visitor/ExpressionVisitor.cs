@@ -2,6 +2,7 @@ using Antlr4.Runtime.Tree;
 using CqlSharp.Exceptions;
 using CqlSharp.Extension;
 using CqlSharp.Sql.Expressions;
+using CqlSharp.Sql.Expressions.Columns;
 using CqlSharp.Sql.Expressions.Literals;
 using CqlSharp.Sql.Expressions.Predicate;
 using CqlSharp.Sql.Expressions.Predicate.Operations;

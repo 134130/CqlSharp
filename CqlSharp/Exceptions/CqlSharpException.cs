@@ -1,4 +1,5 @@
 using CqlSharp.Sql.Expressions;
+using CqlSharp.Sql.Expressions.Columns;
 
 namespace CqlSharp.Exceptions;
 

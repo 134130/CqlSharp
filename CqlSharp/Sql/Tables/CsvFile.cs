@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using CqlSharp.Sql.Expressions;
+using CqlSharp.Sql.Expressions.Columns;
 using CsvHelper;
 
 namespace CqlSharp.Sql.Tables;
@@ -13,7 +14,7 @@ internal class CsvFile : ITable, IDisposable
     private readonly StreamReader _streamReader;
     private readonly CsvReader _csvReader;
 
-    public CsvFile(string filePath, string alias = null)
+    public CsvFile(string filePath, string? alias = null)
     {
         if (string.IsNullOrWhiteSpace(filePath))
             throw new ArgumentNullException(nameof(filePath));
@@ -42,14 +43,17 @@ internal class CsvFile : ITable, IDisposable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string[] FetchRow()
     {
-        return FetchRow(Enumerable.Range(0, Columns.Length));
+        return FetchRow(Enumerable.Range(0, Columns.Length))!;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string[] FetchRow(IEnumerable<int> columnIndexes)
+    public string?[] FetchRow(IEnumerable<int> columnIndexes)
     {
         return columnIndexes.Select(x =>
         {
+            if (x == -1)
+                return null;
+
             if (!_csvReader.TryGetField<string>(x, out var data))
                 throw new InvalidDataException();
 

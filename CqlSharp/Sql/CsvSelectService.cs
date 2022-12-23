@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using CqlSharp.Extension;
 using CqlSharp.Sql.Expressions;
+using CqlSharp.Sql.Expressions.Columns;
 using CqlSharp.Sql.Expressions.Literals;
 using CqlSharp.Sql.Query;
 using CqlSharp.Sql.Tables;
@@ -34,21 +35,54 @@ internal class CsvSelectService : SelectService
         // Select
         var rows = new List<string[]>();
 
-        var columnIndexes = GetColumnIndexes(selectQuery.Columns, csv).ToArray();
+        var indexedColumns = GetIndexedColumns(selectQuery.Columns, csv).ToArray();
+        var columnIndexes = indexedColumns.Select(x => x.IndexOfRow).ToArray();
 
         // Limit
         if (selectQuery.Limit > 0)
         {
             while (rows.Count < selectQuery.Limit && await csv.ReadAsync())
             {
-                rows.Add(csv.FetchRow(columnIndexes));
+                var fetchedRow = csv.FetchRow(columnIndexes);
+
+                // inject calculated column
+                for (var i = 0; i < indexedColumns.Length; i++)
+                {
+                    if (indexedColumns[i].IndexOfRow >= 0)
+                        continue;
+
+                    if (fetchedRow[i] is not null)
+                        throw new InvalidOperationException();
+
+                    fetchedRow[i] = indexedColumns[i].OriginalColumn
+                        .Calculate(csv.Columns, fetchedRow)
+                        .GetSql();
+                }
+
+                rows.Add(fetchedRow!);
             }
         }
         else
         {
             while (await csv.ReadAsync())
             {
-                rows.Add(csv.FetchRow(columnIndexes));
+                var fetchedRow = csv.FetchRow(columnIndexes);
+
+                // inject calculated column
+                for (var i = 0; i < indexedColumns.Length; i++)
+                {
+                    if (indexedColumns[i].IndexOfRow >= 0)
+                        continue;
+
+                    if (fetchedRow[i] is not null)
+                        throw new InvalidOperationException();
+
+                    fetchedRow[i] = indexedColumns[i].OriginalColumn
+                        .Calculate(csv.Columns, fetchedRow)
+                        .GetSql();
+                }
+
+                rows.Add(fetchedRow!);
             }
         }
 
@@ -61,36 +95,64 @@ internal class CsvSelectService : SelectService
         if (selectQuery.WhereExpression is null)
             throw new InvalidOperationException();
 
-        var columnIndexes = GetColumnIndexes(selectQuery.Columns, csv).ToArray();
+        var indexedColumns = GetIndexedColumns(selectQuery.Columns, csv).ToArray();
+        var columnIndexes = indexedColumns.Select(x => x.IndexOfRow);
 
         var rows = new List<string[]>();
         if (selectQuery.Limit > 0)
         {
             while (rows.Count < selectQuery.Limit && await csv.ReadAsync())
             {
-                var row = csv.FetchRow();
+                var fetchedRow = csv.FetchRow();
 
-                if (!IsExpectedRow(selectQuery.WhereExpression, csv.Columns, row))
+                if (!IsExpectedRow(selectQuery.WhereExpression, csv.Columns, fetchedRow))
                     continue;
 
-                var selectedRow = row.ElementsAt(columnIndexes);
-                rows.Add(selectedRow.ToArray());
+                var row = new string?[indexedColumns.Length];
+
+                // inject calculated column
+                for (var i = 0; i < indexedColumns.Length; i++)
+                {
+                    if (indexedColumns[i].IndexOfRow >= 0)
+                    {
+                        row[i] = fetchedRow[indexedColumns[i].IndexOfRow];
+                        continue;
+                    }
+
+                    fetchedRow[i] = indexedColumns[i].OriginalColumn
+                        .Calculate(csv.Columns, fetchedRow)
+                        .GetSql();
+                }
+
+                rows.Add(row!);
             }
         }
         else
         {
             while (await csv.ReadAsync())
             {
-                var row = csv.FetchRow();
+                var fetchedRow = csv.FetchRow();
 
-                if (selectQuery.WhereExpression.Calculate(csv.Columns, row) is not BooleanLiteral booleanLiteral)
+                if (selectQuery.WhereExpression.Calculate(csv.Columns, fetchedRow) is not BooleanLiteral booleanLiteral)
                     throw new InvalidOperationException();
 
                 if (booleanLiteral.Value is false)
                     continue;
 
-                var selectedRow = row.ElementsAt(columnIndexes).ToArray();
-                rows.Add(selectedRow);
+                var row = new string?[indexedColumns.Length];
+
+                // inject calculated column
+                for (var i = 0; i < indexedColumns.Length; i++)
+                {
+                    if (indexedColumns[i].IndexOfRow >= 0)
+                        row[i] = fetchedRow[indexedColumns[i].IndexOfRow];
+
+                    fetchedRow[i] = indexedColumns[i].OriginalColumn
+                        .Calculate(csv.Columns, fetchedRow)
+                        .GetSql();
+                }
+
+                rows.Add(row!);
             }
         }
 
@@ -138,7 +200,7 @@ internal class CsvSelectService : SelectService
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static async ValueTask<Table> FetchCsvFileAsync(string filePath, string alias = null)
+    private static async ValueTask<Table> FetchCsvFileAsync(string filePath, string? alias = null)
     {
         var rows = new List<string[]>();
         using var csv = new CsvFile(filePath, alias);

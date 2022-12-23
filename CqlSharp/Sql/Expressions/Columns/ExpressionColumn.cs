@@ -1,6 +1,6 @@
 using CqlSharp.Sql.Expressions.Literals;
 
-namespace CqlSharp.Sql.Expressions;
+namespace CqlSharp.Sql.Expressions.Columns;
 
 internal class ExpressionColumn : IColumn
 {

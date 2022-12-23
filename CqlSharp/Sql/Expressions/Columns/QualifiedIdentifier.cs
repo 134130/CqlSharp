@@ -2,13 +2,14 @@ using CqlSharp.Exceptions;
 using CqlSharp.Extension;
 using CqlSharp.Sql.Expressions.Literals;
 
-namespace CqlSharp.Sql.Expressions;
+namespace CqlSharp.Sql.Expressions.Columns;
 
 public class QualifiedIdentifier : IColumn
 {
     public int Length => Identifiers.Length;
 
     public string Name => string.Join('.', Identifiers);
+
     public string[] Identifiers { get; set; }
 
     public string this[int index] => Identifiers[index];

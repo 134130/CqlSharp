@@ -1,4 +1,4 @@
-using CqlSharp.Sql.Expressions;
+using CqlSharp.Sql.Expressions.Columns;
 
 namespace CqlSharp.Sql.Tables;
 
@@ -17,11 +17,16 @@ public class Table : ITable
             if (x is QualifiedIdentifier qualifiedIdentifier)
                 return qualifiedIdentifier;
 
-            if (x is ExpressionColumn { Alias: not null } aliased)
-                return new QualifiedIdentifier(aliased.Alias);
+            if (x is ExpressionColumn expressionColumn)
+            {
+                if (expressionColumn.Alias is not null)
+                    return new QualifiedIdentifier(expressionColumn.Alias);
 
-            if (x is ExpressionColumn { Expression: QualifiedIdentifier qi })
-                return qi;
+                if (expressionColumn.Expression is QualifiedIdentifier qi)
+                    return qi;
+
+                return new QualifiedIdentifier(expressionColumn.Expression.GetSql());
+            }
 
             throw new ArgumentOutOfRangeException($"Unexpected column type: {x.GetType().Name}");
         }).ToArray();

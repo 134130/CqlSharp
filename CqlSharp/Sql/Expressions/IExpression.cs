@@ -1,3 +1,4 @@
+using CqlSharp.Sql.Expressions.Columns;
 using CqlSharp.Sql.Expressions.Literals;
 
 namespace CqlSharp.Sql.Expressions;

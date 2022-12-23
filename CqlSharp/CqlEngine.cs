@@ -1,4 +1,5 @@
 using Antlr4.Runtime;
+using CqlSharp.Exceptions;
 using CqlSharp.Parser;
 using CqlSharp.Parser.Visitor;
 using CqlSharp.Sql;
@@ -28,7 +29,7 @@ public static class CqlEngine
         }
         catch (Exception)
         {
-            throw new Exception($"Failed to parse sql: {sql}");
+            throw new CqlSharpException($"Failed to parse sql: {sql}");
         }
 
         if (context.GetChild(0) is not QueryStatementContext queryStatement)

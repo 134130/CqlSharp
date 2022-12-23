@@ -1,5 +1,6 @@
 using System.Text;
 using CqlSharp.Sql.Expressions;
+using CqlSharp.Sql.Expressions.Columns;
 
 namespace CqlSharp.Sql.Query;
 

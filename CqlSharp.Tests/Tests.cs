@@ -13,6 +13,7 @@ public class Test_From_Sql
     [TestCase("(select * from \"/Users/cooper/development/CQLSharp/csv/test1.csv\");")]
     [TestCase("((select * from \"/Users/cooper/development/CQLSharp/csv/test1.csv\"));")]
     [TestCase("select csv.* from \"/Users/cooper/development/CQLSharp/csv/test1.csv\" as csv;")]
+    [TestCase("select csv.firstname from \"/Users/cooper/development/CQLSharp/csv/test1.csv\" as csv;")]
     [TestCase("select * from \"/Users/cooper/development/CQLSharp/csv/test1.csv\" limit 10;")]
     [TestCase("select * from \"/Users/cooper/development/CQLSharp/csv/test1.csv\" limit 10 offset 10;")]
     [TestCase("select * from \"/Users/cooper/development/CQLSharp/csv/test1.csv\" where lastname = 'choi';")]
@@ -26,6 +27,8 @@ public class Test_From_Sql
     [TestCase("select 'hello';")]
     [TestCase("select 'hello, ' + 'world';")]
     [TestCase("select COUNT(*) from \"/Users/cooper/development/CQLSharp/csv/test1.csv\";")]
+    [TestCase("select *, true from \"/Users/cooper/development/CQLSharp/csv/test1.csv\";")]
+    [TestCase("select *, true and true as a from \"/Users/cooper/development/CQLSharp/csv/test1.csv\";")]
     public async Task Test(string sql)
     {
         var query = CqlEngine.Parse(sql);
