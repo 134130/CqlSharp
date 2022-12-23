@@ -16,4 +16,12 @@ internal class SingleTableReference : TableReference
         QualifiedIdentifier = qualifiedIdentifier;
         Alias = alias;
     }
+
+    public override string GetSql()
+    {
+        if (Alias is null)
+            return $"\"{QualifiedIdentifier.GetSql()}\"";
+
+        return $"\"{QualifiedIdentifier.GetSql()}\" AS {Alias}";
+    }
 }

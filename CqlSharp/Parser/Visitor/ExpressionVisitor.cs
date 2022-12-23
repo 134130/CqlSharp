@@ -33,10 +33,7 @@ internal static class ExpressionVisitor
                 return new IsExpression(isVisited, type);
 
             case ExpressionNotContext notContext:
-                return new NotExpression
-                {
-                    Expression = VisitExpression(notContext.GetChild<ExpressionContext>(0))
-                };
+                return new NotExpression(VisitExpression(notContext.GetChild<ExpressionContext>(0)));
 
             case ExpressionAndContext andContext:
                 return new AndOrExpression(
@@ -69,26 +66,12 @@ internal static class ExpressionVisitor
                 var right = VisitPredicate(context.predicate());
                 var compareOperator = VisitCompareOperator(context.compareOperator());
 
-                var compareExpression = new CompareExpression
+                return right switch
                 {
-                    Left = left,
-                    CompareOperator = compareOperator
+                    PredicateExpression predicate => new CompareExpression(left, compareOperator, predicate),
+                    Literal literal => new CompareExpression(left, compareOperator, literal),
+                    QualifiedIdentifier qIdentifier => new CompareExpression(left, compareOperator, qIdentifier),
                 };
-
-                switch (right)
-                {
-                    case PredicateExpression rightPredicate:
-                        compareExpression.RightPredicateExpression = rightPredicate;
-                        break;
-                    case Literal rightLiteral:
-                        compareExpression.RightLiteral = rightLiteral;
-                        break;
-                    case QualifiedIdentifier rightIdentifier:
-                        compareExpression.RightIdentifier = rightIdentifier;
-                        break;
-                }
-
-                return compareExpression;
         }
 
         throw new CqlNotSupportedException(child);

@@ -12,4 +12,9 @@ internal sealed class NumberLiteral : Literal
     {
         Value = value;
     }
+
+    public override string GetSql()
+    {
+        return Value.ToString();
+    }
 }

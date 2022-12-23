@@ -24,4 +24,9 @@ internal sealed class BooleanLiteral : Literal
 
     public static bool operator true(BooleanLiteral x) => x.Value;
     public static bool operator false(BooleanLiteral x) => x.Value;
+
+    public override string GetSql()
+    {
+        return Value ? "TRUE" : "FALSE";
+    }
 }

@@ -43,7 +43,7 @@ public class QualifiedIdentifier : IColumn
         return this;
     }
 
-    public override string ToString()
+    public string GetSql()
     {
         return Name;
     }

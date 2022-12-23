@@ -4,12 +4,27 @@ namespace CqlSharp.Expressions;
 
 internal class NotExpression : IExpression
 {
-    public IExpression Expression { get; set; }
+    public IExpression Expression { get; }
+
+    public NotExpression(IExpression expression)
+    {
+        Expression = expression;
+    }
 
     public IExpression GetOptimizedExpression()
     {
-        Expression = Expression.GetOptimizedExpression() ?? Expression;
-        return this;
+        var optimizedExpression = Expression.GetOptimizedExpression();
+        var optimized = new NotExpression(optimizedExpression);
+
+        if (optimizedExpression is Literal)
+            return optimized.Calculate(null, null);
+
+        return optimized;
+    }
+
+    public string GetSql()
+    {
+        return $"NOT {Expression.GetSql()}";
     }
 
     public Literal Calculate(QualifiedIdentifier[] columns, string[] row)

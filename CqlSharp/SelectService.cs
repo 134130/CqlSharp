@@ -7,15 +7,19 @@ using Serilog.Sinks.SystemConsole.Themes;
 
 namespace CqlSharp;
 
-public class SelectService
+internal class SelectService
 {
-    internal static readonly ILogger Logger = new LoggerConfiguration()
+    private static readonly ILogger Logger = new LoggerConfiguration()
         .WriteTo.Console(theme: AnsiConsoleTheme.Code)
         .MinimumLevel.Verbose()
         .CreateLogger();
 
-    public static async ValueTask<Table> ProcessAsync(Select selectQuery)
+    internal static async ValueTask<Table> ProcessAsync(Select selectQuery)
     {
+        Logger.Verbose("    Plain SQL: {PlainSql}", selectQuery.GetSql());
+        selectQuery.WhereExpression = selectQuery.WhereExpression?.GetOptimizedExpression();
+        Logger.Verbose("Optimized SQL: {OptimizedSql}", selectQuery.GetSql());
+
         if (selectQuery.From is CsvTableReference)
             return await CsvSelectService.ProcessAsync(selectQuery);
 
@@ -60,8 +64,8 @@ public class SelectService
         List<IColumn> columns, QualifiedIdentifier[] atColumns)
     {
         Logger.Verbose("{MethodName} >>", nameof(EscapeWildcards));
-        Logger.Verbose("  atColumns: {AtColumns}", atColumns);
-        Logger.Verbose("     before: {BeforeColumns}", columns);
+        Logger.Verbose("  atColumns: {AtColumns}", atColumns.Select(x => x.GetSql()));
+        Logger.Verbose("     before: {BeforeColumns}", columns.Select(x => x.GetSql()));
 
         for (var i = 0; i < columns.Count; i++)
         {
@@ -76,7 +80,7 @@ public class SelectService
             columns.InsertRange(i, escaped);
         }
 
-        Logger.Verbose("      after: {AfterColumns}", columns);
+        Logger.Verbose("      after: {AfterColumns}", columns.Select(x => x.GetSql()));
     }
 
     internal static IEnumerable<int> GetColumnIndexes(IEnumerable<IColumn> columns, ITable table)

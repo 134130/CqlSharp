@@ -18,4 +18,9 @@ internal sealed class PredicateInOperation : PredicateOperation
 
         return new BooleanLiteral(_literals.Any(x => textLiteral.Value == x));
     }
+
+    public override string GetSql()
+    {
+        return $"IN ({string.Join(", ", _literals)})";
+    }
 }

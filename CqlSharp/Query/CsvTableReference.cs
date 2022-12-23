@@ -14,4 +14,12 @@ internal class CsvTableReference : TableReference
         FilePath = filePath;
         Alias = alias;
     }
+
+    public override string GetSql()
+    {
+        if (Alias is null)
+            return $"\"{FilePath}\"";
+
+        return $"\"{FilePath}\" AS {Alias}";
+    }
 }

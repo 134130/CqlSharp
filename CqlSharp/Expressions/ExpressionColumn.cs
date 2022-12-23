@@ -26,7 +26,16 @@ internal class ExpressionColumn : IColumn
 
     public IExpression GetOptimizedExpression()
     {
-        throw new NotImplementedException();
+        // TODO
+        return this;
+    }
+
+    public string GetSql()
+    {
+        if (Alias is null)
+            return Expression.GetSql();
+
+        return $"{Expression.GetSql()} AS {Alias}";
     }
 
     public override string ToString()

@@ -28,7 +28,7 @@ public class Test_From_Sql
     public async Task Test(string sql)
     {
         var query = CqlEngine.Parse(sql);
-        var result = await SelectService.ProcessAsync(query);
+        var result = await CqlEngine.ProcessAsync(query);
 
         await Verify(AsciiTable(sql, result)).UseDirectory("verified");
     }
@@ -42,7 +42,7 @@ public class Test_From_Sql
     public async Task Test_Predicate_Operations(string sql)
     {
         var query = CqlEngine.Parse(sql);
-        var result = await SelectService.ProcessAsync(query);
+        var result = await CqlEngine.ProcessAsync(query);
 
         await Verify(AsciiTable(sql, result)).UseDirectory("verified");
     }

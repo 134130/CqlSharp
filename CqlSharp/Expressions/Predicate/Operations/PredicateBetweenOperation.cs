@@ -22,4 +22,9 @@ internal sealed class PredicateBetweenOperation : PredicateOperation
             string.CompareOrdinal(_startLiteral, textLiteral.Value) <= 0 &&
             string.CompareOrdinal(textLiteral.Value, _endLiteral) <= 0);
     }
+
+    public override string GetSql()
+    {
+        return $"{_startLiteral} BETWEEN {_endLiteral}";
+    }
 }

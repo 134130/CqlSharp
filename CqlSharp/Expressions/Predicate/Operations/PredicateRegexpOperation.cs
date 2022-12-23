@@ -19,4 +19,9 @@ internal sealed class PredicateRegexpOperation : PredicateOperation
 
         return new BooleanLiteral(_regex.IsMatch(textLiteral.Value));
     }
+
+    public override string GetSql()
+    {
+        return $"REGEXP {_regex}";
+    }
 }

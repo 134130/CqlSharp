@@ -9,6 +9,11 @@ using static CqlParser;
 
 public class CqlEngine
 {
+    public static async ValueTask<Table> ProcessAsync(Select select)
+    {
+        return await SelectService.ProcessAsync(select);
+    }
+
     public static Select Parse(string sql)
     {
         Console.WriteLine(sql);

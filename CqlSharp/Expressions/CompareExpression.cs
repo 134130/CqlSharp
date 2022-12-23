@@ -1,19 +1,65 @@
 using CqlSharp.Expressions.Literals;
-using CqlSharp.Expressions.Predicate;
 
 namespace CqlSharp.Expressions;
 
 internal class CompareExpression : IExpression
 {
-    public IExpression Left { get; set; }
+    public IExpression Left { get; }
 
-    public Literal? RightLiteral { get; set; }
+    public IExpression Right { get; }
 
-    public QualifiedIdentifier? RightIdentifier { get; set; }
+    public CompareOperator CompareOperator { get; }
 
-    public PredicateExpression? RightPredicateExpression { get; set; }
+    public CompareExpression(IExpression left, CompareOperator compareOperator, IExpression right)
+    {
+        Left = left;
+        CompareOperator = compareOperator;
+        Right = right;
+    }
 
-    public CompareOperator CompareOperator { get; set; }
+    public IExpression GetOptimizedExpression()
+    {
+        var left = Left.GetOptimizedExpression();
+        var right = Right.GetOptimizedExpression();
+
+        var optimized = new CompareExpression(left, CompareOperator, right);
+
+        if (left is Literal && right is Literal)
+            return optimized.Calculate(null, null);
+
+        return optimized;
+    }
+
+    public string GetSql()
+    {
+        var compareOperatorString = CompareOperator switch
+        {
+            CompareOperator.Equal => "=",
+            CompareOperator.NotEqual => "!=",
+            CompareOperator.GreaterOrEqual => ">=",
+            CompareOperator.GreaterThan => ">",
+            CompareOperator.LessOrEqual => "<=",
+            CompareOperator.LessThan => "<",
+            _ => throw new ArgumentOutOfRangeException()
+        };
+
+        return $"{Left.GetSql()} {compareOperatorString} {Right.GetSql()}";
+    }
+
+    public Literal Calculate(QualifiedIdentifier[] columns, string[] row)
+    {
+        var left = Left.Calculate(columns, row);
+        var right = Right.Calculate(columns, row);
+
+        if (left is NumberLiteral numLeft && right is NumberLiteral numRight)
+            return new BooleanLiteral(Operate(numLeft.Value, numRight.Value));
+
+        if (left is TextLiteral textLeft && right is TextLiteral textRight)
+            return new BooleanLiteral(Operate(textLeft.Value, textRight.Value));
+
+        throw new InvalidOperationException(
+            $"Cant compare. left: {left.GetType().Name}, right: {right.GetType().Name}");
+    }
 
     private bool Operate(string left, string right)
     {
@@ -41,25 +87,5 @@ internal class CompareExpression : IExpression
             CompareOperator.LessThan => left < right,
             _ => throw new ArgumentOutOfRangeException()
         };
-    }
-
-    public Literal Calculate(QualifiedIdentifier[] columns, string[] row)
-    {
-        var left = Left.Calculate(columns, row);
-        var right = RightLiteral ?? RightIdentifier?.Calculate(columns, row) ??
-            RightPredicateExpression?.Calculate(columns, row);
-
-        if (left is NumberLiteral numLeft && right is NumberLiteral numRight)
-            return new BooleanLiteral(Operate(numLeft.Value, numRight.Value));
-
-        if (left is TextLiteral textLeft && right is TextLiteral textRight)
-            return new BooleanLiteral(Operate(textLeft.Value, textRight.Value));
-
-        throw new InvalidOperationException();
-    }
-
-    public IExpression GetOptimizedExpression()
-    {
-        return this;
     }
 }

@@ -14,4 +14,12 @@ internal class SubQueryTableReference : TableReference
         SubQuery = subQuery;
         Alias = alias;
     }
+
+    public override string GetSql()
+    {
+        if (Alias is null)
+            return $"({SubQuery.GetSql()})";
+
+        return $"({SubQuery.GetSql()}) AS {Alias}";
+    }
 }

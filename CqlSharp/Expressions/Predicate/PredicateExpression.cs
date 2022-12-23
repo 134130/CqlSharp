@@ -32,22 +32,26 @@ internal class PredicateExpression : IExpression
         if (PredicateOperation is null)
             throw new InvalidOperationException();
 
+        // TODO: remove literal, qidentifier and switch to IExpression
         var result = PredicateOperation.Calculate(Literal ?? qualifiedIdentifier);
         return IsNot ? !result : result;
     }
 
     public IExpression GetOptimizedExpression()
     {
-        if (QualifiedIdentifier is { })
+        if (QualifiedIdentifier is not null)
             return this;
 
-        if (PredicateOperation is { })
-        {
-            var result = PredicateOperation.Calculate(Literal);
+        if (Literal is null)
+            throw new InvalidOperationException();
 
-            return IsNot ? !result : result;
-        }
+        var result = PredicateOperation.Calculate(Literal);
+        return IsNot ? !result : result;
+    }
 
-        return Literal;
+    public string GetSql()
+    {
+        var left = QualifiedIdentifier?.GetSql() ?? Literal?.GetSql() ?? "???";
+        return $"{left} {PredicateOperation.GetSql()}";
     }
 }

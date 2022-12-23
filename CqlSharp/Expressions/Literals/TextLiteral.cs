@@ -12,4 +12,9 @@ internal sealed class TextLiteral : Literal
     {
         Value = value;
     }
+
+    public override string GetSql()
+    {
+        return $"'{Value}'";
+    }
 }

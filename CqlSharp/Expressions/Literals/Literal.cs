@@ -11,4 +11,6 @@ public abstract class Literal : IExpression
     {
         return this;
     }
+
+    public abstract string GetSql();
 }
