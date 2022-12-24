@@ -81,10 +81,10 @@ SELECT COUNT(*) FROM "test2.csv" WHERE firstname = 'evan' OR TRUE;
 ```
 
 Not Optimized: `55ms` <br>
-<img width="682" alt="image" src="https://user-images.githubusercontent.com/50487467/209339599-347f6487-dc2b-4f17-a9fe-422f0f1e15c4.png">
-
 Optimized: `33ms` <br>
-<img width="678" alt="image" src="https://user-images.githubusercontent.com/50487467/209339656-f8b2e6f1-68b9-4a7e-a770-311fbe37f78f.png">
+<img width="701" alt="스크린샷 2022-12-24 21 20 01" src="https://user-images.githubusercontent.com/50487467/209436110-87e2067a-2530-4497-80ff-d1f93d58d4ef.png">
+
+
 
 
 
